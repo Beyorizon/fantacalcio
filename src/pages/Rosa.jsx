@@ -499,19 +499,22 @@ export default function Rosa() {
             background-color: #e9ecef !important;
           }
 
-          .box-extra {
-            margin-top: 2rem;
+          .giocatori-extra-box {
+            width: 80%;
+            max-width: 640px;
+            margin: 2rem auto 0 auto;
             padding: 1.5rem;
             background-color: #f8f9fa;
             border-radius: 12px;
             border: 1px solid #dee2e6;
           }
 
-          .box-extra h3 {
+          .giocatori-extra-box h3 {
             margin: 0 0 1rem 0;
             color: #495057;
             font-size: 1.1rem;
             font-weight: 600;
+            text-align: center;
           }
 
           .tabella-extra {
@@ -548,12 +551,13 @@ export default function Rosa() {
               padding: 1rem 0.5rem !important;
             }
             
-            .box-extra {
+            .giocatori-extra-box {
+              width: 95%;
               margin-top: 1.5rem;
               padding: 1rem;
             }
             
-            .box-extra h3 {
+            .giocatori-extra-box h3 {
               font-size: 1rem;
             }
           }
@@ -563,7 +567,8 @@ export default function Rosa() {
               padding: 0.5rem 0.25rem !important;
             }
             
-            .box-extra {
+            .giocatori-extra-box {
+              width: 100%;
               margin-top: 1rem;
               padding: 0.75rem;
             }
@@ -571,7 +576,7 @@ export default function Rosa() {
         `}
       </style>
       
-      {/* Tabella principale con giocatori normali */}
+      {/* Tabella principale con giocatori normali e totale */}
       <table className="tabella-rosa">
         <thead>
           <tr>
@@ -596,6 +601,7 @@ export default function Rosa() {
           </tr>
         </thead>
         <tbody>
+          {/* Giocatori normali */}
           {giocatoriNormali.map((giocatore, index) => (
             <tr key={index}>
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
@@ -606,13 +612,9 @@ export default function Rosa() {
               <td>{renderCell(giocatore, index, 'fm')}</td>
             </tr>
           ))}
-        </tbody>
-      </table>
-
-      {/* Riga TOTALE */}
-      {totale && (
-        <table className="tabella-rosa" style={{ marginTop: '1rem' }}>
-          <tbody>
+          
+          {/* Riga TOTALE integrata nella tabella principale */}
+          {totale && (
             <tr className="riga-totale">
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totale.numero}</td>
               <td style={{ fontWeight: 'bold' }}>{totale.nome}</td>
@@ -621,13 +623,13 @@ export default function Rosa() {
               <td style={{ fontWeight: 'bold', color: '#007bff' }}>{totale.cl || '-'}</td>
               <td>{totale.fm || '-'}</td>
             </tr>
-          </tbody>
-        </table>
-      )}
+          )}
+        </tbody>
+      </table>
 
       {/* Sezione giocatori extra */}
       {giocatoriExtra.length > 0 && (
-        <div className="box-extra">
+        <div className="giocatori-extra-box">
           <h3>🎯 Giocatori Extra (oltre 28)</h3>
           <table className="tabella-extra">
             <thead>
