@@ -53,7 +53,7 @@ export default function Rosa() {
 
   // Funzione per ordinare i giocatori secondo la sequenza specifica
   const rosaOrdinata = [...rosa].sort((a, b) => {
-    const ordine = ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1))];
+    const ordine = ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1)), "TOTALE"];
     const indexA = ordine.indexOf(a.numero);
     const indexB = ordine.indexOf(b.numero);
     
@@ -74,10 +74,9 @@ export default function Rosa() {
   const giocatoriPrincipali = rosaOrdinata.filter(giocatore => {
     const numero = giocatore.numero;
     return numero === 'P1' || numero === 'P2' || 
-           (parseInt(numero) >= 1 && parseInt(numero) <= 28);
+           (parseInt(numero) >= 1 && parseInt(numero) <= 28) ||
+           numero === 'TOTALE';
   });
-
-  const totale = rosaOrdinata.find(giocatore => giocatore.numero === 'TOTALE');
 
   const giocatoriExtra = rosaOrdinata.filter(giocatore => {
     const numero = parseInt(giocatore.numero);
@@ -501,11 +500,11 @@ export default function Rosa() {
           }
 
           .giocatori-extra-box {
-            width: 100%;
-            max-width: 800px;
+            width: 80%;
+            max-width: 640px;
             margin: 2rem auto 0 auto;
             padding: 1.5rem;
-            background-color: #f8f9fa;
+            background-color: #f3f4f6;
             border-radius: 12px;
             border: 1px solid #dee2e6;
           }
@@ -553,7 +552,7 @@ export default function Rosa() {
             }
             
             .giocatori-extra-box {
-              width: 100%;
+              width: 95%;
               margin-top: 1.5rem;
               padding: 1rem;
             }
@@ -615,17 +614,6 @@ export default function Rosa() {
               <td>{renderCell(giocatore, index, 'fm')}</td>
             </tr>
           ))}
-          {/* TOTALE row */}
-          {totale && (
-            <tr className="riga-totale">
-              <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totale.numero}</td>
-              <td style={{ fontWeight: 'bold' }}>{totale.nome}</td>
-              <td>{totale.ruolo}</td>
-              <td>{totale.sc || '-'}</td>
-              <td style={{ fontWeight: 'bold', color: '#007bff' }}>{totale.cl || '-'}</td>
-              <td>{totale.fm || '-'}</td>
-            </tr>
-          )}
         </tbody>
       </table>
 
