@@ -35,11 +35,10 @@ export default function Rosa() {
 
       // 2. Recupera il nome dell'utente
       const { data: utente, error: erroreUtente } = await supabase
-      .from('utenti')
-      .select('nome')
-      .eq('nome', utenteId) // usa 'nome' invece di 'id'
-      .single();
-    
+        .from('utenti')
+        .select('nome')
+        .eq('nome', utenteId)
+        .single();
 
       if (erroreUtente) {
         console.error('Errore nel recupero del nome utente:', erroreUtente);
@@ -92,7 +91,7 @@ export default function Rosa() {
     if (!editingCell) return;
 
     const { rowIndex, column } = editingCell;
-    const giocatore = rosaOrdinata[rowIndex]; // Usa rosaOrdinata invece di rosa
+    const giocatore = rosaOrdinata[rowIndex];
 
     try {
       const { error } = await supabase
@@ -103,9 +102,6 @@ export default function Rosa() {
       if (error) {
         throw error;
       }
-
-      // Se è stata modificata la colonna CL, il trigger PostgreSQL si occuperà automaticamente del totale
-      // Non serve più chiamare manualmente la funzione JavaScript
 
       // Show success feedback
       setFeedback({
@@ -149,43 +145,6 @@ export default function Rosa() {
 
     setEditingCell(null);
     setEditValue('');
-  };
-
-  // Funzione per chiamare manualmente il ricalcolo del totale (opzionale)
-  const handleClChange = async (id, nuovoCl, utente) => {
-    try {
-      // 1. Aggiorna il valore cl del singolo giocatore
-      const { error: updateError } = await supabase
-        .from('giocatori')
-        .update({ cl: nuovoCl })
-        .eq('id', id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      // 2. Chiama la funzione Postgres per ricalcolare il totale
-      const { error: rpcError } = await supabase.rpc('aggiorna_totale_utente', { 
-        user_id: utente 
-      });
-
-      if (rpcError) {
-        console.error('Errore nel ricalcolo del totale:', rpcError);
-      }
-
-      // 3. Ricarica i dati per mostrare il totale aggiornato
-      const { data: giocatori, error: fetchError } = await supabase
-        .from('giocatori')
-        .select('*')
-        .eq('utente', utenteId);
-
-      if (!fetchError) {
-        setRosa(giocatori);
-      }
-
-    } catch (error) {
-      console.error('Errore nell\'aggiornamento CL:', error);
-    }
   };
 
   const handleKeyPress = (e) => {
