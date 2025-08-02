@@ -70,6 +70,19 @@ export default function Rosa() {
     return 0;
   });
 
+  // Suddivisione dei giocatori in gruppi
+  const giocatoriNormali = rosaOrdinata.filter(giocatore => {
+    const numero = parseInt(giocatore.numero);
+    return numero >= 1 && numero <= 28;
+  });
+
+  const giocatoriExtra = rosaOrdinata.filter(giocatore => {
+    const numero = parseInt(giocatore.numero);
+    return numero > 28;
+  });
+
+  const totale = rosaOrdinata.find(giocatore => giocatore.numero === 'TOTALE');
+
   const handleCellClick = (rowIndex, column, currentValue) => {
     setEditingCell({ rowIndex, column });
     setEditValue(currentValue?.toString() || '');
@@ -434,9 +447,114 @@ export default function Rosa() {
             100% { opacity: 0; }
           }
           
+          .tabella-rosa {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-weight: 500;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            table-layout: fixed;
+          }
+
+          .tabella-rosa th,
+          .tabella-rosa td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+          }
+
+          .tabella-rosa th {
+            background-color: #f2f2f2;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #333;
+          }
+
+          .tabella-rosa tr:last-child td {
+            border-bottom: none;
+          }
+
+          .tabella-rosa tr:hover {
+            background-color: #f9fafb;
+          }
+
+          .nome-giocatore {
+            font-weight: 700;
+          }
+
+          .riga-totale {
+            border-top: 2px solid #007bff !important;
+            background-color: #f8f9fa !important;
+            font-weight: bold;
+          }
+
+          .riga-totale:hover {
+            background-color: #e9ecef !important;
+          }
+
+          .box-extra {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+          }
+
+          .box-extra h3 {
+            margin: 0 0 1rem 0;
+            color: #495057;
+            font-size: 1.1rem;
+            font-weight: 600;
+          }
+
+          .tabella-extra {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .tabella-extra th,
+          .tabella-extra td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+          }
+
+          .tabella-extra th {
+            background-color: #e9ecef;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #495057;
+          }
+
+          .tabella-extra tr:hover {
+            background-color: #f1f3f4;
+          }
+          
           @media screen and (max-width: 768px) {
             .rosa-container {
               padding: 1rem 0.5rem !important;
+            }
+            
+            .box-extra {
+              margin-top: 1.5rem;
+              padding: 1rem;
+            }
+            
+            .box-extra h3 {
+              font-size: 1rem;
             }
           }
           
@@ -444,10 +562,16 @@ export default function Rosa() {
             .rosa-container {
               padding: 0.5rem 0.25rem !important;
             }
+            
+            .box-extra {
+              margin-top: 1rem;
+              padding: 0.75rem;
+            }
           }
         `}
       </style>
       
+      {/* Tabella principale con giocatori normali */}
       <table className="tabella-rosa">
         <thead>
           <tr>
@@ -472,7 +596,7 @@ export default function Rosa() {
           </tr>
         </thead>
         <tbody>
-          {rosaOrdinata.map((giocatore, index) => (
+          {giocatoriNormali.map((giocatore, index) => (
             <tr key={index}>
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
               <td>{renderNomeCell(giocatore, index)}</td>
@@ -484,6 +608,53 @@ export default function Rosa() {
           ))}
         </tbody>
       </table>
+
+      {/* Riga TOTALE */}
+      {totale && (
+        <table className="tabella-rosa" style={{ marginTop: '1rem' }}>
+          <tbody>
+            <tr className="riga-totale">
+              <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totale.numero}</td>
+              <td style={{ fontWeight: 'bold' }}>{totale.nome}</td>
+              <td>{totale.ruolo}</td>
+              <td>{totale.sc || '-'}</td>
+              <td style={{ fontWeight: 'bold', color: '#007bff' }}>{totale.cl || '-'}</td>
+              <td>{totale.fm || '-'}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+
+      {/* Sezione giocatori extra */}
+      {giocatoriExtra.length > 0 && (
+        <div className="box-extra">
+          <h3>🎯 Giocatori Extra (oltre 28)</h3>
+          <table className="tabella-extra">
+            <thead>
+              <tr>
+                <th>NUMERO</th>
+                <th>NOME</th>
+                <th>R</th>
+                <th>SC</th>
+                <th>CL</th>
+                <th>FM</th>
+              </tr>
+            </thead>
+            <tbody>
+              {giocatoriExtra.map((giocatore, index) => (
+                <tr key={`extra-${index}`}>
+                  <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
+                  <td>{renderNomeCell(giocatore, `extra-${index}`)}</td>
+                  <td>{renderRoleCell(giocatore, `extra-${index}`)}</td>
+                  <td>{renderCell(giocatore, `extra-${index}`, 'sc')}</td>
+                  <td>{renderCell(giocatore, `extra-${index}`, 'cl')}</td>
+                  <td>{renderCell(giocatore, `extra-${index}`, 'fm')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
