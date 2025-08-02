@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import App from './App.jsx';
 import Home from './pages/Home.jsx';
 import Rosa from './pages/Rosa.jsx';
@@ -9,7 +9,7 @@ import './App.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<Home />} />
@@ -17,6 +17,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="aggiornamenti" element={<Aggiornamenti />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>
 );
