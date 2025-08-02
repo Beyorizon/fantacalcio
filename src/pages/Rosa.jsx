@@ -3,6 +3,14 @@ import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
 import MiniMenu from '../components/MiniMenu';
 
+// Predefined role options
+const ruoloOptions = [
+  "Por", "DC", "DD E", "DS E", "DC DS E", "DD DS E", "DC DS", "DC DD",
+  "B DS E", "B DD E", "E", "EW", "EM", "EC",
+  "M", "MC", "C", "CT", "CW", "CWT",
+  "T", "W", "WT", "WA", "TA", "A", "Pc"
+];
+
 export default function Rosa() {
   const { utenteId } = useParams();
   const [rosa, setRosa] = useState([]);
@@ -180,57 +188,6 @@ export default function Rosa() {
     handleSave();
   };
 
-  const handleRoleChange = async (giocatoreId, nuovoRuolo) => {
-    try {
-      const { error } = await supabase
-        .from('giocatori')
-        .update({ ruolo: nuovoRuolo })
-        .eq('id', giocatoreId);
-
-      if (error) {
-        throw error;
-      }
-
-      // Aggiorna lo stato locale
-      setRosa(prev => 
-        prev.map(giocatore => 
-          giocatore.id === giocatoreId 
-            ? { ...giocatore, ruolo: nuovoRuolo }
-            : giocatore
-        )
-      );
-
-      // Mostra feedback di successo
-      setFeedback({
-        rowIndex: rosaOrdinata.findIndex(g => g.id === giocatoreId),
-        column: 'ruolo',
-        message: 'Salvato',
-        type: 'success'
-      });
-
-      // Clear feedback after 2 seconds
-      setTimeout(() => {
-        setFeedback(null);
-      }, 2000);
-
-    } catch (error) {
-      console.error('Errore nel salvataggio del ruolo:', error);
-      
-      // Show error feedback
-      setFeedback({
-        rowIndex: rosaOrdinata.findIndex(g => g.id === giocatoreId),
-        column: 'ruolo',
-        message: 'Errore',
-        type: 'error'
-      });
-
-      // Clear feedback after 2 seconds
-      setTimeout(() => {
-        setFeedback(null);
-      }, 2000);
-    }
-  };
-
   const renderCell = (giocatore, rowIndex, column) => {
     const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.column === column;
     const currentValue = giocatore[column];
@@ -298,6 +255,72 @@ export default function Rosa() {
     );
   };
 
+  const renderNomeCell = (giocatore, rowIndex) => {
+    const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.column === 'nome';
+    const currentValue = giocatore.nome;
+    const hasFeedback = feedback?.rowIndex === rowIndex && feedback?.column === 'nome';
+
+    if (isEditing) {
+      return (
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            onBlur={handleBlur}
+            autoFocus
+            style={{
+              width: '120px',
+              padding: '4px',
+              border: '1px solid #007bff',
+              borderRadius: '4px',
+              fontSize: '14px'
+            }}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <span
+          onClick={() => handleCellClick(rowIndex, 'nome', currentValue)}
+          style={{
+            cursor: 'pointer',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            display: 'inline-block',
+            fontWeight: 'bold'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#f8f9fa';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+          }}
+        >
+          {currentValue || '-'}
+        </span>
+        {hasFeedback && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '-20px',
+              right: '-10px',
+              fontSize: '12px',
+              color: feedback.type === 'success' ? '#28a745' : '#dc3545',
+              fontWeight: 'bold',
+              animation: 'fadeInOut 2s ease-in-out'
+            }}
+          >
+            {feedback.type === 'success' ? '✅ ' : '❌ '}{feedback.message}
+          </span>
+        )}
+      </div>
+    );
+  };
+
   const renderRoleCell = (giocatore, rowIndex) => {
     const hasFeedback = feedback?.rowIndex === rowIndex && feedback?.column === 'ruolo';
 
@@ -317,10 +340,11 @@ export default function Rosa() {
           }}
         >
           <option value="">-</option>
-          <option value="POR">POR</option>
-          <option value="DIF">DIF</option>
-          <option value="CEN">CEN</option>
-          <option value="ATT">ATT</option>
+          {ruoloOptions.map((ruolo) => (
+            <option key={ruolo} value={ruolo}>
+              {ruolo}
+            </option>
+          ))}
         </select>
         {hasFeedback && (
           <span
@@ -339,6 +363,57 @@ export default function Rosa() {
         )}
       </div>
     );
+  };
+
+  const handleRoleChange = async (giocatoreId, nuovoRuolo) => {
+    try {
+      const { error } = await supabase
+        .from('giocatori')
+        .update({ ruolo: nuovoRuolo })
+        .eq('id', giocatoreId);
+
+      if (error) {
+        throw error;
+      }
+
+      // Aggiorna lo stato locale
+      setRosa(prev => 
+        prev.map(giocatore => 
+          giocatore.id === giocatoreId 
+            ? { ...giocatore, ruolo: nuovoRuolo }
+            : giocatore
+        )
+      );
+
+      // Mostra feedback di successo
+      setFeedback({
+        rowIndex: rosaOrdinata.findIndex(g => g.id === giocatoreId),
+        column: 'ruolo',
+        message: 'Salvato',
+        type: 'success'
+      });
+
+      // Clear feedback after 2 seconds
+      setTimeout(() => {
+        setFeedback(null);
+      }, 2000);
+
+    } catch (error) {
+      console.error('Errore nel salvataggio del ruolo:', error);
+      
+      // Show error feedback
+      setFeedback({
+        rowIndex: rosaOrdinata.findIndex(g => g.id === giocatoreId),
+        column: 'ruolo',
+        message: 'Errore',
+        type: 'error'
+      });
+
+      // Clear feedback after 2 seconds
+      setTimeout(() => {
+        setFeedback(null);
+      }, 2000);
+    }
   };
 
   return (
@@ -400,7 +475,7 @@ export default function Rosa() {
           {rosaOrdinata.map((giocatore, index) => (
             <tr key={index}>
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
-              <td className="nome-giocatore">{giocatore.nome}</td>
+              <td>{renderNomeCell(giocatore, index)}</td>
               <td>{renderRoleCell(giocatore, index)}</td>
               <td>{renderCell(giocatore, index, 'sc')}</td>
               <td>{renderCell(giocatore, index, 'cl')}</td>
