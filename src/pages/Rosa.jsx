@@ -53,7 +53,7 @@ export default function Rosa() {
 
   // Funzione per ordinare i giocatori secondo la sequenza specifica
   const rosaOrdinata = [...rosa].sort((a, b) => {
-    const ordine = ["P1", "P2", "N", ...Array.from({ length: 28 }, (_, i) => String(i + 1))];
+    const ordine = ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1))];
     const indexA = ordine.indexOf(a.numero);
     const indexB = ordine.indexOf(b.numero);
     
@@ -71,17 +71,17 @@ export default function Rosa() {
   });
 
   // Suddivisione dei giocatori in gruppi
-  const giocatoriNormali = rosaOrdinata.filter(giocatore => {
-    const numero = parseInt(giocatore.numero);
-    return numero >= 1 && numero <= 28;
+  const giocatoriPrincipali = rosaOrdinata.filter(giocatore => {
+    const numero = giocatore.numero;
+    return numero === 'P1' || numero === 'P2' || 
+           (parseInt(numero) >= 1 && parseInt(numero) <= 28) ||
+           numero === 'TOTALE';
   });
 
   const giocatoriExtra = rosaOrdinata.filter(giocatore => {
     const numero = parseInt(giocatore.numero);
-    return numero > 28;
+    return numero === 29 || numero === 30;
   });
-
-  const totale = rosaOrdinata.find(giocatore => giocatore.numero === 'TOTALE');
 
   const handleCellClick = (rowIndex, column, currentValue) => {
     setEditingCell({ rowIndex, column });
@@ -576,7 +576,7 @@ export default function Rosa() {
         `}
       </style>
       
-      {/* Tabella principale con giocatori normali e totale */}
+      {/* Tabella principale con giocatori principali (P1, P2, 1-28, TOTALE) */}
       <table className="tabella-rosa">
         <thead>
           <tr>
@@ -601,36 +601,26 @@ export default function Rosa() {
           </tr>
         </thead>
         <tbody>
-          {/* Giocatori normali */}
-          {giocatoriNormali.map((giocatore, index) => (
-            <tr key={index}>
+          {/* Giocatori principali: P1, P2, 1-28, TOTALE */}
+          {giocatoriPrincipali.map((giocatore, index) => (
+            <tr key={index} className={giocatore.numero === 'TOTALE' ? 'riga-totale' : ''}>
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
               <td>{renderNomeCell(giocatore, index)}</td>
               <td>{renderRoleCell(giocatore, index)}</td>
               <td>{renderCell(giocatore, index, 'sc')}</td>
-              <td>{renderCell(giocatore, index, 'cl')}</td>
+              <td style={giocatore.numero === 'TOTALE' ? { fontWeight: 'bold', color: '#007bff' } : {}}>
+                {giocatore.numero === 'TOTALE' ? (giocatore.cl || '-') : renderCell(giocatore, index, 'cl')}
+              </td>
               <td>{renderCell(giocatore, index, 'fm')}</td>
             </tr>
           ))}
-          
-          {/* Riga TOTALE integrata nella tabella principale */}
-          {totale && (
-            <tr className="riga-totale">
-              <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totale.numero}</td>
-              <td style={{ fontWeight: 'bold' }}>{totale.nome}</td>
-              <td>{totale.ruolo}</td>
-              <td>{totale.sc || '-'}</td>
-              <td style={{ fontWeight: 'bold', color: '#007bff' }}>{totale.cl || '-'}</td>
-              <td>{totale.fm || '-'}</td>
-            </tr>
-          )}
         </tbody>
       </table>
 
-      {/* Sezione giocatori extra */}
+      {/* Sezione giocatori extra (29-30) */}
       {giocatoriExtra.length > 0 && (
         <div className="giocatori-extra-box">
-          <h3>🎯 Giocatori Extra (oltre 28)</h3>
+          <h3>🎯 Giocatori Extra (29-30)</h3>
           <table className="tabella-extra">
             <thead>
               <tr>
