@@ -302,7 +302,11 @@ export default function Rosa() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ 
+      padding: '2rem',
+      maxWidth: '100%',
+      overflowX: 'auto'
+    }}>
       <MiniMenu />
       <h2 style={{ marginBottom: '1.5rem' }}>Rosa di {nomeUtente}</h2>
       
@@ -313,6 +317,18 @@ export default function Rosa() {
             20% { opacity: 1; }
             80% { opacity: 1; }
             100% { opacity: 0; }
+          }
+          
+          @media screen and (max-width: 768px) {
+            .rosa-container {
+              padding: 1rem 0.5rem !important;
+            }
+          }
+          
+          @media screen and (max-width: 480px) {
+            .rosa-container {
+              padding: 0.5rem 0.25rem !important;
+            }
           }
         `}
       </style>
