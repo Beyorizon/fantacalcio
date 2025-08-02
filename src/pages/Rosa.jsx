@@ -200,7 +200,7 @@ export default function Rosa() {
       return (
         <div style={{ position: 'relative' }}>
           <input
-            type="number"
+            type="text"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             onKeyPress={handleKeyPress}
