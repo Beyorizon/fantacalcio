@@ -83,10 +83,8 @@ export default function Rosa() {
         throw error;
       }
 
-      // Se è stata modificata la colonna CL, ricalcola il totale
-      if (column === 'cl') {
-        await updateCLTotal();
-      }
+      // Se è stata modificata la colonna CL, il trigger PostgreSQL si occuperà automaticamente del totale
+      // Non serve più chiamare manualmente la funzione JavaScript
 
       // Show success feedback
       setFeedback({
@@ -132,45 +130,40 @@ export default function Rosa() {
     setEditValue('');
   };
 
-  // Funzione per calcolare e aggiornare il totale CL
-  const updateCLTotal = async () => {
+  // Funzione per chiamare manualmente il ricalcolo del totale (opzionale)
+  const handleClChange = async (id, nuovoCl, utente) => {
     try {
-      // Recupera tutti i giocatori dell'utente (escluso TOTALE)
-      const { data: giocatori, error: fetchError } = await supabase
-        .from('giocatori')
-        .select('cl')
-        .eq('utente', utenteId)
-        .neq('numero', 'TOTALE');
-
-      if (fetchError) {
-        console.error('Errore nel recupero dei giocatori per il calcolo:', fetchError);
-        return;
-      }
-
-      // Calcola la somma dei valori CL (escludendo valori null, undefined o non numerici)
-      const totaleCL = giocatori.reduce((sum, giocatore) => {
-        const valoreCL = parseFloat(giocatore.cl);
-        return isNaN(valoreCL) ? sum : sum + valoreCL;
-      }, 0);
-
-      // Arrotonda a 2 decimali
-      const totaleCLArrotondato = Math.round(totaleCL * 100) / 100;
-
-      // Aggiorna la riga TOTALE
+      // 1. Aggiorna il valore cl del singolo giocatore
       const { error: updateError } = await supabase
         .from('giocatori')
-        .update({ cl: totaleCLArrotondato.toString() })
-        .eq('utente', utenteId)
-        .eq('numero', 'TOTALE');
+        .update({ cl: nuovoCl })
+        .eq('id', id);
 
       if (updateError) {
-        console.error('Errore nell\'aggiornamento del totale CL:', updateError);
-      } else {
-        console.log('Totale CL aggiornato:', totaleCLArrotondato);
+        throw updateError;
+      }
+
+      // 2. Chiama la funzione Postgres per ricalcolare il totale
+      const { error: rpcError } = await supabase.rpc('aggiorna_totale_utente', { 
+        user_id: utente 
+      });
+
+      if (rpcError) {
+        console.error('Errore nel ricalcolo del totale:', rpcError);
+      }
+
+      // 3. Ricarica i dati per mostrare il totale aggiornato
+      const { data: giocatori, error: fetchError } = await supabase
+        .from('giocatori')
+        .select('*')
+        .eq('utente', utenteId);
+
+      if (!fetchError) {
+        setRosa(giocatori);
       }
 
     } catch (error) {
-      console.error('Errore nel calcolo del totale CL:', error);
+      console.error('Errore nell\'aggiornamento CL:', error);
     }
   };
 
