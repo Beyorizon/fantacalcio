@@ -83,6 +83,11 @@ export default function Rosa() {
         throw error;
       }
 
+      // Se è stata modificata la colonna CL, ricalcola il totale
+      if (column === 'cl') {
+        await updateCLTotal();
+      }
+
       // Show success feedback
       setFeedback({
         rowIndex,
@@ -125,6 +130,48 @@ export default function Rosa() {
 
     setEditingCell(null);
     setEditValue('');
+  };
+
+  // Funzione per calcolare e aggiornare il totale CL
+  const updateCLTotal = async () => {
+    try {
+      // Recupera tutti i giocatori dell'utente (escluso TOTALE)
+      const { data: giocatori, error: fetchError } = await supabase
+        .from('giocatori')
+        .select('cl')
+        .eq('utente', utenteId)
+        .neq('numero', 'TOTALE');
+
+      if (fetchError) {
+        console.error('Errore nel recupero dei giocatori per il calcolo:', fetchError);
+        return;
+      }
+
+      // Calcola la somma dei valori CL (escludendo valori null, undefined o non numerici)
+      const totaleCL = giocatori.reduce((sum, giocatore) => {
+        const valoreCL = parseFloat(giocatore.cl);
+        return isNaN(valoreCL) ? sum : sum + valoreCL;
+      }, 0);
+
+      // Arrotonda a 2 decimali
+      const totaleCLArrotondato = Math.round(totaleCL * 100) / 100;
+
+      // Aggiorna la riga TOTALE
+      const { error: updateError } = await supabase
+        .from('giocatori')
+        .update({ cl: totaleCLArrotondato.toString() })
+        .eq('utente', utenteId)
+        .eq('numero', 'TOTALE');
+
+      if (updateError) {
+        console.error('Errore nell\'aggiornamento del totale CL:', updateError);
+      } else {
+        console.log('Totale CL aggiornato:', totaleCLArrotondato);
+      }
+
+    } catch (error) {
+      console.error('Errore nel calcolo del totale CL:', error);
+    }
   };
 
   const handleKeyPress = (e) => {
