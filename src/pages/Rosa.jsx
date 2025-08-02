@@ -74,9 +74,10 @@ export default function Rosa() {
   const giocatoriPrincipali = rosaOrdinata.filter(giocatore => {
     const numero = giocatore.numero;
     return numero === 'P1' || numero === 'P2' || 
-           (parseInt(numero) >= 1 && parseInt(numero) <= 28) ||
-           numero === 'TOTALE';
+           (parseInt(numero) >= 1 && parseInt(numero) <= 28);
   });
+
+  const totale = rosaOrdinata.find(giocatore => giocatore.numero === 'TOTALE');
 
   const giocatoriExtra = rosaOrdinata.filter(giocatore => {
     const numero = parseInt(giocatore.numero);
@@ -500,8 +501,8 @@ export default function Rosa() {
           }
 
           .giocatori-extra-box {
-            width: 80%;
-            max-width: 640px;
+            width: 100%;
+            max-width: 800px;
             margin: 2rem auto 0 auto;
             padding: 1.5rem;
             background-color: #f8f9fa;
@@ -552,7 +553,7 @@ export default function Rosa() {
             }
             
             .giocatori-extra-box {
-              width: 95%;
+              width: 100%;
               margin-top: 1.5rem;
               padding: 1rem;
             }
@@ -614,6 +615,17 @@ export default function Rosa() {
               <td>{renderCell(giocatore, index, 'fm')}</td>
             </tr>
           ))}
+          {/* TOTALE row */}
+          {totale && (
+            <tr className="riga-totale">
+              <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totale.numero}</td>
+              <td style={{ fontWeight: 'bold' }}>{totale.nome}</td>
+              <td>{totale.ruolo}</td>
+              <td>{totale.sc || '-'}</td>
+              <td style={{ fontWeight: 'bold', color: '#007bff' }}>{totale.cl || '-'}</td>
+              <td>{totale.fm || '-'}</td>
+            </tr>
+          )}
         </tbody>
       </table>
 
