@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const TopBar = ({ title, right, className = '' }) => {
+const TopBar = ({ title, right, refreshAction, className = '' }) => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -49,6 +49,30 @@ const TopBar = ({ title, right, className = '' }) => {
         {/* Right side actions */}
         <div className="flex items-center gap-3">
           {right}
+          
+          {/* Refresh button - only show when refreshAction is provided */}
+          {refreshAction && (
+            <motion.button
+              onClick={refreshAction.onClick}
+              disabled={refreshAction.loading}
+              className="p-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              whileHover={{ scale: refreshAction.loading ? 1 : 1.05 }}
+              whileTap={{ scale: refreshAction.loading ? 1 : 0.95 }}
+              title="Aggiorna Totale"
+            >
+              {refreshAction.loading ? (
+                <motion.div
+                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              ) : (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666z" clipRule="evenodd" />
+                </svg>
+              )}
+            </motion.button>
+          )}
           
           {/* Dark mode toggle */}
           <motion.button

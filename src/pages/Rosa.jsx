@@ -3,7 +3,6 @@ import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
 import Toast from '../ui/Toast';
-import FAB from '../ui/FAB';
 
 // Predefined role options
 const ruoloOptions = [
@@ -189,7 +188,13 @@ export default function Rosa() {
   };
 
   return (
-    <AppLayout title={`Rosa di ${nomeUtente}`}>
+    <AppLayout 
+      title={`Rosa di ${nomeUtente}`}
+      refreshAction={{
+        onClick: handleAggiornaTotale,
+        loading: updatingTotale
+      }}
+    >
       {/* Toast notifications */}
       <Toast
         message={toast.message}
@@ -368,16 +373,6 @@ export default function Rosa() {
           </div>
         </div>
       )}
-
-      {/* Floating Action Button */}
-      <FAB
-        onClick={handleAggiornaTotale}
-        loading={updatingTotale}
-        disabled={updatingTotale}
-        title="Aggiorna Totale"
-      >
-        🔄
-      </FAB>
     </AppLayout>
   );
 }

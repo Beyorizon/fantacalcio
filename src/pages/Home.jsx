@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import AppLayout from '../layouts/AppLayout';
-import TopBar from '../ui/TopBar';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
-import BottomNav from '../ui/BottomNav';
 
 export default function Home() {
   const [utenti, setUtenti] = useState([]);
