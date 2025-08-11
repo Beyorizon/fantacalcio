@@ -155,6 +155,20 @@ export default function Rosa() {
     );
   };
 
+  const renderU23Cell = (giocatore, rowIndex) => {
+    return (
+      <select
+        value={giocatore.u23 || ""}
+        onChange={(e) => handleU23Change(giocatore.id, e.target.value)}
+        style={{ padding: '4px', fontSize: '14px', minWidth: '60px' }}
+      >
+        <option value="">-</option>
+        <option value="Si">Si</option>
+        <option value="No">No</option>
+      </select>
+    );
+  };
+
   const handleRoleChange = async (giocatoreId, nuovoRuolo) => {
     const { error } = await supabase
       .from('giocatori')
@@ -164,6 +178,19 @@ export default function Rosa() {
     if (!error) {
       setRosa(prev =>
         prev.map(g => g.id === giocatoreId ? { ...g, ruolo: nuovoRuolo } : g)
+      );
+    }
+  };
+
+  const handleU23Change = async (giocatoreId, nuovoU23) => {
+    const { error } = await supabase
+      .from('giocatori')
+      .update({ u23: nuovoU23 })
+      .eq('id', giocatoreId);
+
+    if (!error) {
+      setRosa(prev =>
+        prev.map(g => g.id === giocatoreId ? { ...g, u23: nuovoU23 } : g)
       );
     }
   };
@@ -180,6 +207,7 @@ export default function Rosa() {
             <th>Numero</th>
             <th>Nome</th>
             <th>R</th>
+            <th>U23</th>
             <th>SC</th>
             <th>CL</th>
             <th>FM</th>
@@ -191,6 +219,7 @@ export default function Rosa() {
               <td>{g.numero}</td>
               <td>{renderNomeCell(g, i)}</td>
               <td>{renderRoleCell(g, i)}</td>
+              <td>{renderU23Cell(g, i)}</td>
               <td>{renderCell(g, i, 'sc')}</td>
               <td>{renderCell(g, i, 'cl')}</td>
               <td>{renderCell(g, i, 'fm')}</td>
@@ -214,6 +243,7 @@ export default function Rosa() {
                 <th>Numero</th>
                 <th>Nome</th>
                 <th>R</th>
+                <th>U23</th>
                 <th>SC</th>
                 <th>CL</th>
                 <th>FM</th>
@@ -225,6 +255,7 @@ export default function Rosa() {
                   <td>{g.numero}</td>
                   <td>{renderNomeCell(g, `extra-${i}`)}</td>
                   <td>{renderRoleCell(g, `extra-${i}`)}</td>
+                  <td>{renderU23Cell(g, `extra-${i}`)}</td>
                   <td>{renderCell(g, `extra-${i}`, 'sc')}</td>
                   <td>{renderCell(g, `extra-${i}`, 'cl')}</td>
                   <td>{renderCell(g, `extra-${i}`, 'fm')}</td>
