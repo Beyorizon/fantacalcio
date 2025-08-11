@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { Link } from 'react-router-dom';
-import MiniMenu from '../components/MiniMenu';
+import AppLayout from '../layouts/AppLayout';
+import Card from '../ui/Card';
+import Button from '../ui/Button';
 
 export default function Home() {
   const [utenti, setUtenti] = useState([]);
@@ -24,60 +26,31 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <MiniMenu />
-      <div style={{ padding: '2rem' }}>
-        <h2 style={{ marginBottom: '1.5rem' }}>Lista Utenti</h2>
-        <div style={{ 
-          display: 'grid', 
-          gap: '1rem',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'
-        }}>
-          {utenti.map((utente) => (
-            <div 
-              key={utente.id} 
-              style={{
-                padding: '1rem',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: '#fff',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-            >
-              <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+    <AppLayout title="Lista Utenti">
+      <div className="space-y-4">
+        {utenti.map((utente) => (
+          <Card key={utente.id} className="p-4 hover:shadow-card transition-shadow duration-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 {utente.nome}
               </h3>
-              <Link
-                to={`/rosa/${utente.nome}`}
-                style={{
-                  display: 'inline-block',
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  textDecoration: 'none',
-                  borderRadius: '4px',
-                  fontSize: '0.9rem'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
-              >
-                Vedi Rosa
+              <Link to={`/rosa/${utente.nome}`}>
+                <Button variant="primary" size="sm">
+                  Vedi Rosa
+                </Button>
               </Link>
             </div>
-          ))}
-        </div>
+          </Card>
+        ))}
         
         {utenti.length === 0 && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '2rem', 
-            color: '#666',
-            fontStyle: 'italic'
-          }}>
-            Nessun utente trovato.
-          </div>
+          <Card className="p-8 text-center">
+            <div className="text-zinc-500 dark:text-zinc-400 italic">
+              Nessun utente trovato.
+            </div>
+          </Card>
         )}
       </div>
-    </>
+    </AppLayout>
   );
 }

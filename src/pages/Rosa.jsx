@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
-import MiniMenu from '../components/MiniMenu';
+import AppLayout from '../layouts/AppLayout';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
+import ResponsiveTable from '../ui/ResponsiveTable';
+import FAB from '../ui/FAB';
+import Toast from '../ui/Toast';
 
 // Predefined role options
 const ruoloOptions = [
@@ -58,14 +63,7 @@ const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
         onKeyPress={handleKeyPress}
         onBlur={handleBlur}
         autoFocus
-        style={{
-          width: '100%',
-          padding: '4px 8px',
-          border: '1px solid #007bff',
-          borderRadius: '4px',
-          fontSize: '14px',
-          boxSizing: 'border-box'
-        }}
+        className="w-full px-3 py-2 rounded-xl border-2 border-brand-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/20 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
       />
     );
   }
@@ -73,24 +71,7 @@ const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
   return (
     <span
       onClick={() => setIsEditing(true)}
-      style={{
-        cursor: 'pointer',
-        display: 'inline-block',
-        width: '100%',
-        padding: '4px 8px',
-        border: '1px solid transparent',
-        borderRadius: '4px',
-        minHeight: '20px',
-        lineHeight: '20px'
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.border = '1px solid #e9ecef';
-        e.target.style.backgroundColor = '#f8f9fa';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.border = '1px solid transparent';
-        e.target.style.backgroundColor = 'transparent';
-      }}
+      className="cursor-pointer inline-block w-full px-3 py-2 rounded-xl border-2 border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 min-h-[40px] flex items-center"
     >
       {value || '-'}
     </span>
@@ -103,6 +84,7 @@ export default function Rosa() {
   const [nomeUtente, setNomeUtente] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [updatingTotale, setUpdatingTotale] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
 
   useEffect(() => {
     const fetchDati = async () => {
@@ -150,11 +132,11 @@ export default function Rosa() {
       setRosa(prev =>
         prev.map(g => (g.id === giocatoreId ? { ...g, [campo]: valore } : g))
       );
-      setFeedback({ id: giocatoreId, campo, message: 'Salvato', type: 'success' });
-      setTimeout(() => setFeedback(null), 2000);
+      setToast({ show: true, message: 'Salvato!', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 2000);
     } else {
-      setFeedback({ id: giocatoreId, campo, message: 'Errore', type: 'error' });
-      setTimeout(() => setFeedback(null), 2000);
+      setToast({ show: true, message: 'Errore nel salvataggio', type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 2000);
     }
   };
 
@@ -162,15 +144,7 @@ export default function Rosa() {
     <select
       value={giocatore[campo] || ""}
       onChange={(e) => handleUpdate(giocatore.id, campo, e.target.value)}
-      style={{
-        padding: '4px 8px',
-        border: '1px solid #ced4da',
-        borderRadius: '4px',
-        fontSize: '14px',
-        backgroundColor: 'white',
-        cursor: 'pointer',
-        minWidth: '60px'
-      }}
+      className="w-full px-3 py-2 rounded-xl border-2 border-zinc-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer"
     >
       {options.map(opt => (
         <option key={opt} value={opt}>
@@ -205,156 +179,180 @@ export default function Rosa() {
       
       if (giocatori) setRosa(giocatori);
 
-      alert('Totale aggiornato!');
+      setToast({ show: true, message: 'Totale aggiornato!', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
     } catch (err) {
       console.error('Errore aggiorna_totale_utente:', err);
-      alert('Errore nell\'aggiornamento del totale. Controlla la console.');
+      setToast({ show: true, message: 'Errore nell\'aggiornamento del totale', type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
     } finally {
       setUpdatingTotale(false);
     }
   };
 
+  // Prepare table data for ResponsiveTable
+  const tableColumns = [
+    { key: 'numero', label: 'Numero' },
+    { key: 'nome', label: 'Nome' },
+    { key: 'ruolo', label: 'Ruolo' },
+    { key: 'u23', label: 'U23' },
+    { key: 'sc', label: 'SC' },
+    { key: 'cl', label: 'CL' },
+    { key: 'fm', label: 'FM' }
+  ];
+
+  const tableRows = giocatoriPrincipali.map(giocatore => ({
+    ...giocatore,
+    numero: giocatore.numero || '-',
+    nome: (
+      <EditableCell
+        value={giocatore.nome}
+        field="nome"
+        giocatoreId={giocatore.id}
+        onSave={handleUpdate}
+        type="text"
+      />
+    ),
+    ruolo: renderSelectCell(giocatore, 'ruolo', ruoloOptions),
+    u23: renderSelectCell(giocatore, 'u23', u23Options),
+    sc: (
+      <EditableCell
+        value={giocatore.sc}
+        field="sc"
+        giocatoreId={giocatore.id}
+        onSave={handleUpdate}
+        type="text"
+      />
+    ),
+    cl: (
+      <EditableCell
+        value={giocatore.cl}
+        field="cl"
+        giocatoreId={giocatore.id}
+        onSave={handleUpdate}
+        type="number"
+      />
+    ),
+    fm: (
+      <EditableCell
+        value={giocatore.fm}
+        field="fm"
+        giocatoreId={giocatore.id}
+        onSave={handleUpdate}
+        type="number"
+      />
+    )
+  }));
+
   return (
-    <div style={{ padding: '2rem', maxWidth: '100%', overflowX: 'auto' }}>
-      <MiniMenu />
-      <h2 style={{ marginBottom: '1.5rem' }}>Rosa di {nomeUtente}</h2>
-      
-      {/* Bottone Aggiorna Totale */}
-      <div style={{ marginBottom: '1rem' }}>
-        <button
-          onClick={handleAggiornaTotale}
-          disabled={updatingTotale}
-          className="px-3 py-2 rounded bg-blue-600 text-white disabled:opacity-60"
-          title="Ricalcola il totale su Supabase"
-        >
-          {updatingTotale ? 'Aggiorno…' : 'Aggiorna Totale'}
-        </button>
+    <AppLayout title={`Rosa di ${nomeUtente}`}>
+      {/* Toast notifications */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.show}
+        onClose={() => setToast({ show: false, message: '', type: 'info' })}
+      />
+
+      {/* Main roster table */}
+      <div className="space-y-4">
+        <ResponsiveTable columns={tableColumns} rows={tableRows} />
       </div>
 
-      {/* Tabella principale */}
-      <table className="tabella-rosa">
-        <thead>
-          <tr>
-            <th>NUMERO</th>
-            <th>NOME</th>
-            <th>R</th>
-            <th>U23</th>
-            <th>SC</th>
-            <th>CL</th>
-            <th>FM</th>
-          </tr>
-        </thead>
-        <tbody>
-          {giocatoriPrincipali.map((giocatore) => (
-            <tr key={giocatore.id} className={giocatore.numero === 'X' ? 'riga-totale' : ''}>
-              <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
-              <td>
-                <EditableCell
-                  value={giocatore.nome}
-                  field="nome"
-                  giocatoreId={giocatore.id}
-                  onSave={handleUpdate}
-                  type="text"
-                />
-              </td>
-              <td>{renderSelectCell(giocatore, 'ruolo', ruoloOptions)}</td>
-              <td>{renderSelectCell(giocatore, 'u23', u23Options)}</td>
-              <td>
-                <EditableCell
-                  value={giocatore.sc}
-                  field="sc"
-                  giocatoreId={giocatore.id}
-                  onSave={handleUpdate}
-                  type="text"
-                />
-              </td>
-              <td>
-                <EditableCell
-                  value={giocatore.cl}
-                  field="cl"
-                  giocatoreId={giocatore.id}
-                  onSave={handleUpdate}
-                  type="number"
-                />
-              </td>
-              <td>
-                <EditableCell
-                  value={giocatore.fm}
-                  field="fm"
-                  giocatoreId={giocatore.id}
-                  onSave={handleUpdate}
-                  type="number"
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Tabella extra */}
+      {/* Extra players section */}
       {giocatoriExtra.length > 0 && (
-        <div className="giocatori-extra-box">
-          <h3>🎯 Giocatori Extra (29-30)</h3>
-          <table className="tabella-extra">
-            <thead>
-              <tr>
-                <th>NUMERO</th>
-                <th>NOME</th>
-                <th>R</th>
-                <th>U23</th>
-                <th>SC</th>
-                <th>CL</th>
-                <th>FM</th>
-              </tr>
-            </thead>
-            <tbody>
-              {giocatoriExtra.map((giocatore) => (
-                <tr key={giocatore.id}>
-                  <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
-                  <td>
-                    <EditableCell
-                      value={giocatore.nome}
-                      field="nome"
-                      giocatoreId={giocatore.id}
-                      onSave={handleUpdate}
-                      type="text"
-                    />
-                  </td>
-                  <td>{renderSelectCell(giocatore, 'ruolo', ruoloOptions)}</td>
-                  <td>{renderSelectCell(giocatore, 'u23', u23Options)}</td>
-                  <td>
-                    <EditableCell
-                      value={giocatore.sc}
-                      field="sc"
-                      giocatoreId={giocatore.id}
-                      onSave={handleUpdate}
-                      type="text"
-                    />
-                  </td>
-                  <td>
-                    <EditableCell
-                      value={giocatore.cl}
-                      field="cl"
-                      giocatoreId={giocatore.id}
-                      onSave={handleUpdate}
-                      type="number"
-                    />
-                  </td>
-                  <td>
-                    <EditableCell
-                      value={giocatore.fm}
-                      field="fm"
-                      giocatoreId={giocatore.id}
-                      onSave={handleUpdate}
-                      type="number"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 text-center">
+            🎯 Giocatori Extra (29-30)
+          </h3>
+          <div className="space-y-3">
+            {giocatoriExtra.map((giocatore) => (
+              <Card key={giocatore.id} className="p-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">Numero:</span>
+                      <span className="font-medium">{giocatore.numero || '-'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">Nome:</span>
+                      <div className="flex-1 ml-2">
+                        <EditableCell
+                          value={giocatore.nome}
+                          field="nome"
+                          giocatoreId={giocatore.id}
+                          onSave={handleUpdate}
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">Ruolo:</span>
+                      <div className="flex-1 ml-2">
+                        {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">U23:</span>
+                      <div className="flex-1 ml-2">
+                        {renderSelectCell(giocatore, 'u23', u23Options)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">SC:</span>
+                      <div className="flex-1 ml-2">
+                        <EditableCell
+                          value={giocatore.sc}
+                          field="sc"
+                          giocatoreId={giocatore.id}
+                          onSave={handleUpdate}
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">CL:</span>
+                      <div className="flex-1 ml-2">
+                        <EditableCell
+                          value={giocatore.cl}
+                          field="cl"
+                          giocatoreId={giocatore.id}
+                          onSave={handleUpdate}
+                          type="number"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500 dark:text-zinc-400">FM:</span>
+                      <div className="flex-1 ml-2">
+                        <EditableCell
+                          value={giocatore.fm}
+                          field="fm"
+                          giocatoreId={giocatore.id}
+                          onSave={handleUpdate}
+                          type="number"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
-    </div>
+
+      {/* Floating Action Button */}
+      <FAB
+        onClick={handleAggiornaTotale}
+        loading={updatingTotale}
+        disabled={updatingTotale}
+        title="Aggiorna Totale"
+      >
+        🔄
+      </FAB>
+    </AppLayout>
   );
 }
