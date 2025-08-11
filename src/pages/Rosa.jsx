@@ -102,6 +102,7 @@ export default function Rosa() {
   const [rosa, setRosa] = useState([]);
   const [nomeUtente, setNomeUtente] = useState('');
   const [feedback, setFeedback] = useState(null);
+  const [updatingTotale, setUpdatingTotale] = useState(false);
 
   useEffect(() => {
     const fetchDati = async () => {
@@ -181,27 +182,35 @@ export default function Rosa() {
 
   // Aggiorna totale function
   const handleAggiornaTotale = async () => {
+    setUpdatingTotale(true);
     try {
-      const { error } = await supabase.rpc('recalc_totale', { utente: nomeUtente });
-      
-      if (!error) {
-        // Reload the data after recalculation
-        const { data: giocatori } = await supabase
-          .from('giocatori')
-          .select('*')
-          .eq('utente', utenteId);
-        
-        if (giocatori) setRosa(giocatori);
-        
-        setFeedback({ message: 'Totale aggiornato con successo!', type: 'success' });
-        setTimeout(() => setFeedback(null), 3000);
-      } else {
-        setFeedback({ message: 'Errore nell\'aggiornamento del totale', type: 'error' });
-        setTimeout(() => setFeedback(null), 3000);
+      // 1° tentativo: parametro "nome_utente"
+      let { error } = await supabase.rpc('aggiorna_totale_utente', {
+        nome_utente: nomeUtente, // <- variabile già usata per filtrare la rosa
+      });
+
+      // Se l'RPC fallisce per parametro errato, riprova con "p_nome_utente"
+      if (error) {
+        const retry = await supabase.rpc('aggiorna_totale_utente', {
+          p_nome_utente: nomeUtente,
+        });
+        if (retry.error) throw retry.error;
       }
+
+      // Ricarica i dati della tabella
+      const { data: giocatori } = await supabase
+        .from('giocatori')
+        .select('*')
+        .eq('utente', utenteId);
+      
+      if (giocatori) setRosa(giocatori);
+
+      alert('Totale aggiornato!');
     } catch (err) {
-      setFeedback({ message: 'Errore nella chiamata RPC', type: 'error' });
-      setTimeout(() => setFeedback(null), 3000);
+      console.error('Errore aggiorna_totale_utente:', err);
+      alert('Errore nell\'aggiornamento del totale. Controlla la console.');
+    } finally {
+      setUpdatingTotale(false);
     }
   };
 
@@ -214,36 +223,12 @@ export default function Rosa() {
       <div style={{ marginBottom: '1rem' }}>
         <button
           onClick={handleAggiornaTotale}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
+          disabled={updatingTotale}
+          className="px-3 py-2 rounded bg-blue-600 text-white disabled:opacity-60"
+          title="Ricalcola il totale su Supabase"
         >
-          🔄 Aggiorna Totale
+          {updatingTotale ? 'Aggiorno…' : 'Aggiorna Totale'}
         </button>
-        
-        {/* Feedback message */}
-        {feedback?.message && (
-          <span style={{
-            marginLeft: '1rem',
-            padding: '8px 12px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            color: feedback.type === 'success' ? '#155724' : '#721c24',
-            backgroundColor: feedback.type === 'success' ? '#d4edda' : '#f8d7da',
-            border: `1px solid ${feedback.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-          }}>
-            {feedback.message}
-          </span>
-        )}
       </div>
 
       {/* Tabella principale */}
