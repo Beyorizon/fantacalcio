@@ -13,6 +13,90 @@ const ruoloOptions = [
 
 const u23Options = ["", "Si", "No"];
 
+// EditableCell component for inline editing
+const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value || '');
+
+  const handleSave = async () => {
+    let finalValue = editValue.trim();
+    
+    // Convert empty string to null for number fields
+    if (type === 'number' && finalValue === '') {
+      finalValue = null;
+    } else if (type === 'number') {
+      finalValue = Number(finalValue);
+      if (isNaN(finalValue)) {
+        finalValue = null;
+      }
+    }
+
+    await onSave(giocatoreId, field, finalValue);
+    setIsEditing(false);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setEditValue(value || '');
+      setIsEditing(false);
+    }
+  };
+
+  const handleBlur = () => {
+    handleSave();
+  };
+
+  if (isEditing) {
+    return (
+      <input
+        type={type === 'number' ? 'number' : 'text'}
+        step={type === 'number' ? '0.01' : undefined}
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onKeyPress={handleKeyPress}
+        onBlur={handleBlur}
+        autoFocus
+        style={{
+          width: '100%',
+          padding: '4px 8px',
+          border: '1px solid #007bff',
+          borderRadius: '4px',
+          fontSize: '14px',
+          boxSizing: 'border-box'
+        }}
+      />
+    );
+  }
+
+  return (
+    <span
+      onClick={() => setIsEditing(true)}
+      style={{
+        cursor: 'pointer',
+        display: 'inline-block',
+        width: '100%',
+        padding: '4px 8px',
+        border: '1px solid transparent',
+        borderRadius: '4px',
+        minHeight: '20px',
+        lineHeight: '20px'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.border = '1px solid #e9ecef';
+        e.target.style.backgroundColor = '#f8f9fa';
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.border = '1px solid transparent';
+        e.target.style.backgroundColor = 'transparent';
+      }}
+    >
+      {value || '-'}
+    </span>
+  );
+};
+
 export default function Rosa() {
   const { utenteId } = useParams();
   const [rosa, setRosa] = useState([]);
@@ -95,10 +179,72 @@ export default function Rosa() {
     </select>
   );
 
+  // Aggiorna totale function
+  const handleAggiornaTotale = async () => {
+    try {
+      const { error } = await supabase.rpc('recalc_totale', { utente: nomeUtente });
+      
+      if (!error) {
+        // Reload the data after recalculation
+        const { data: giocatori } = await supabase
+          .from('giocatori')
+          .select('*')
+          .eq('utente', utenteId);
+        
+        if (giocatori) setRosa(giocatori);
+        
+        setFeedback({ message: 'Totale aggiornato con successo!', type: 'success' });
+        setTimeout(() => setFeedback(null), 3000);
+      } else {
+        setFeedback({ message: 'Errore nell\'aggiornamento del totale', type: 'error' });
+        setTimeout(() => setFeedback(null), 3000);
+      }
+    } catch (err) {
+      setFeedback({ message: 'Errore nella chiamata RPC', type: 'error' });
+      setTimeout(() => setFeedback(null), 3000);
+    }
+  };
+
   return (
     <div style={{ padding: '2rem', maxWidth: '100%', overflowX: 'auto' }}>
       <MiniMenu />
       <h2 style={{ marginBottom: '1.5rem' }}>Rosa di {nomeUtente}</h2>
+      
+      {/* Bottone Aggiorna Totale */}
+      <div style={{ marginBottom: '1rem' }}>
+        <button
+          onClick={handleAggiornaTotale}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
+        >
+          🔄 Aggiorna Totale
+        </button>
+        
+        {/* Feedback message */}
+        {feedback?.message && (
+          <span style={{
+            marginLeft: '1rem',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            fontSize: '14px',
+            color: feedback.type === 'success' ? '#155724' : '#721c24',
+            backgroundColor: feedback.type === 'success' ? '#d4edda' : '#f8d7da',
+            border: `1px solid ${feedback.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
+          }}>
+            {feedback.message}
+          </span>
+        )}
+      </div>
 
       {/* Tabella principale */}
       <table className="tabella-rosa">
@@ -117,12 +263,44 @@ export default function Rosa() {
           {giocatoriPrincipali.map((giocatore) => (
             <tr key={giocatore.id} className={giocatore.numero === 'X' ? 'riga-totale' : ''}>
               <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
-              <td>{giocatore.nome || '-'}</td>
+              <td>
+                <EditableCell
+                  value={giocatore.nome}
+                  field="nome"
+                  giocatoreId={giocatore.id}
+                  onSave={handleUpdate}
+                  type="text"
+                />
+              </td>
               <td>{renderSelectCell(giocatore, 'ruolo', ruoloOptions)}</td>
               <td>{renderSelectCell(giocatore, 'u23', u23Options)}</td>
-              <td>{giocatore.sc || '-'}</td>
-              <td>{giocatore.cl || '-'}</td>
-              <td>{giocatore.fm || '-'}</td>
+              <td>
+                <EditableCell
+                  value={giocatore.sc}
+                  field="sc"
+                  giocatoreId={giocatore.id}
+                  onSave={handleUpdate}
+                  type="text"
+                />
+              </td>
+              <td>
+                <EditableCell
+                  value={giocatore.cl}
+                  field="cl"
+                  giocatoreId={giocatore.id}
+                  onSave={handleUpdate}
+                  type="number"
+                />
+              </td>
+              <td>
+                <EditableCell
+                  value={giocatore.fm}
+                  field="fm"
+                  giocatoreId={giocatore.id}
+                  onSave={handleUpdate}
+                  type="number"
+                />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -148,12 +326,44 @@ export default function Rosa() {
               {giocatoriExtra.map((giocatore) => (
                 <tr key={giocatore.id}>
                   <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{giocatore.numero || '-'}</td>
-                  <td>{giocatore.nome || '-'}</td>
+                  <td>
+                    <EditableCell
+                      value={giocatore.nome}
+                      field="nome"
+                      giocatoreId={giocatore.id}
+                      onSave={handleUpdate}
+                      type="text"
+                    />
+                  </td>
                   <td>{renderSelectCell(giocatore, 'ruolo', ruoloOptions)}</td>
                   <td>{renderSelectCell(giocatore, 'u23', u23Options)}</td>
-                  <td>{giocatore.sc || '-'}</td>
-                  <td>{giocatore.cl || '-'}</td>
-                  <td>{giocatore.fm || '-'}</td>
+                  <td>
+                    <EditableCell
+                      value={giocatore.sc}
+                      field="sc"
+                      giocatoreId={giocatore.id}
+                      onSave={handleUpdate}
+                      type="text"
+                    />
+                  </td>
+                  <td>
+                    <EditableCell
+                      value={giocatore.cl}
+                      field="cl"
+                      giocatoreId={giocatore.id}
+                      onSave={handleUpdate}
+                      type="number"
+                    />
+                  </td>
+                  <td>
+                    <EditableCell
+                      value={giocatore.fm}
+                      field="fm"
+                      giocatoreId={giocatore.id}
+                      onSave={handleUpdate}
+                      type="number"
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
