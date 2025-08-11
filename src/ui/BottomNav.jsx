@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 
 const navItems = [
   { path: '/', label: 'Home', icon: '🏠' },
-  { path: '/rosa', label: 'Rosa', icon: '⚽' },
-  { path: '/mercato', label: 'Mercato', icon: '💰' },
-  { path: '/impostazioni', label: 'Impostazioni', icon: '⚙️' }
+  { path: '/news', label: 'News', icon: '📰' },
+  { path: '/regolamento', label: 'Regolamento', icon: '📖' },
+  { path: '/scambi', label: 'Scambi', icon: '🤝' },
+  { path: '/login', label: 'Login', icon: '🔐' }
 ];
 
 const BottomNav = () => {

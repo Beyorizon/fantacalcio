@@ -1,38 +1,9 @@
 import { motion } from 'framer-motion';
-import Card from './Card';
 
 export function ResponsiveTable({ columns, rows, className = '' }) {
-  // Mobile: card per riga
-  const MobileView = () => (
-    <div className="space-y-3">
-      {rows.map((row, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.18, delay: i * 0.05 }}
-        >
-          <Card className="hover:shadow-md transition-shadow duration-200">
-            {columns.map((col) => (
-              <div key={col.key} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
-                  {col.label}
-                </span>
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {col.render ? col.render(row) : row[col.key] || '-'}
-                </div>
-              </div>
-            ))}
-          </Card>
-        </motion.div>
-      ))}
-    </div>
-  );
-
-  // Desktop: tabella classica con header sticky
-  const DesktopView = () => (
-    <div className="overflow-x-auto">
-      <table className="min-w-full">
+  return (
+    <div className={`w-full overflow-x-auto pb-20 ${className}`}>
+      <table className="min-w-[900px] table-fixed text-sm md:text-base">
         <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
           <tr>
             {columns.map(col => (
@@ -63,20 +34,6 @@ export function ResponsiveTable({ columns, rows, className = '' }) {
           ))}
         </tbody>
       </table>
-    </div>
-  );
-
-  return (
-    <div className={`w-full ${className}`}>
-      {/* Mobile view */}
-      <div className="md:hidden">
-        <MobileView />
-      </div>
-      
-      {/* Desktop view */}
-      <div className="hidden md:block">
-        <DesktopView />
-      </div>
     </div>
   );
 }

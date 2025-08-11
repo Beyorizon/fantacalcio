@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
-import Button from '../ui/Button';
-import Card from '../ui/Card';
-import ResponsiveTable from '../ui/ResponsiveTable';
-import FAB from '../ui/FAB';
 import Toast from '../ui/Toast';
+import FAB from '../ui/FAB';
 
 // Predefined role options
 const ruoloOptions = [
@@ -63,7 +60,8 @@ const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
         onKeyPress={handleKeyPress}
         onBlur={handleBlur}
         autoFocus
-        className="w-full px-3 py-2 rounded-xl border-2 border-brand-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-400/20 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        className="w-full rounded-lg border px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+        aria-label={`${field} riga ${giocatoreId}`}
       />
     );
   }
@@ -71,7 +69,7 @@ const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
   return (
     <span
       onClick={() => setIsEditing(true)}
-      className="cursor-pointer inline-block w-full px-3 py-2 rounded-xl border-2 border-transparent hover:border-zinc-200 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 min-h-[40px] flex items-center"
+      className="cursor-pointer inline-block w-full px-2 py-1 rounded-lg border-2 border-transparent hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 min-h-[32px] flex items-center"
     >
       {value || '-'}
     </span>
@@ -82,9 +80,8 @@ export default function Rosa() {
   const { utenteId } = useParams();
   const [rosa, setRosa] = useState([]);
   const [nomeUtente, setNomeUtente] = useState('');
-  const [feedback, setFeedback] = useState(null);
-  const [updatingTotale, setUpdatingTotale] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+  const [updatingTotale, setUpdatingTotale] = useState(false);
 
   useEffect(() => {
     const fetchDati = async () => {
@@ -136,7 +133,7 @@ export default function Rosa() {
       setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 2000);
     } else {
       setToast({ show: true, message: 'Errore nel salvataggio', type: 'error' });
-      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 2000);
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
     }
   };
 
@@ -144,7 +141,8 @@ export default function Rosa() {
     <select
       value={giocatore[campo] || ""}
       onChange={(e) => handleUpdate(giocatore.id, campo, e.target.value)}
-      className="w-full px-3 py-2 rounded-xl border-2 border-zinc-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer"
+      className="w-full rounded-lg border px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 cursor-pointer"
+      aria-label={`${campo} riga ${giocatore.id}`}
     >
       {options.map(opt => (
         <option key={opt} value={opt}>
@@ -190,60 +188,6 @@ export default function Rosa() {
     }
   };
 
-  // Prepare table data for ResponsiveTable
-  const tableColumns = [
-    { key: 'numero', label: 'Numero' },
-    { key: 'nome', label: 'Nome' },
-    { key: 'ruolo', label: 'Ruolo' },
-    { key: 'u23', label: 'U23' },
-    { key: 'sc', label: 'SC' },
-    { key: 'cl', label: 'CL' },
-    { key: 'fm', label: 'FM' }
-  ];
-
-  const tableRows = giocatoriPrincipali.map(giocatore => ({
-    ...giocatore,
-    numero: giocatore.numero || '-',
-    nome: (
-      <EditableCell
-        value={giocatore.nome}
-        field="nome"
-        giocatoreId={giocatore.id}
-        onSave={handleUpdate}
-        type="text"
-      />
-    ),
-    ruolo: renderSelectCell(giocatore, 'ruolo', ruoloOptions),
-    u23: renderSelectCell(giocatore, 'u23', u23Options),
-    sc: (
-      <EditableCell
-        value={giocatore.sc}
-        field="sc"
-        giocatoreId={giocatore.id}
-        onSave={handleUpdate}
-        type="text"
-      />
-    ),
-    cl: (
-      <EditableCell
-        value={giocatore.cl}
-        field="cl"
-        giocatoreId={giocatore.id}
-        onSave={handleUpdate}
-        type="number"
-      />
-    ),
-    fm: (
-      <EditableCell
-        value={giocatore.fm}
-        field="fm"
-        giocatoreId={giocatore.id}
-        onSave={handleUpdate}
-        type="number"
-      />
-    )
-  }));
-
   return (
     <AppLayout title={`Rosa di ${nomeUtente}`}>
       {/* Toast notifications */}
@@ -255,91 +199,172 @@ export default function Rosa() {
       />
 
       {/* Main roster table */}
-      <div className="space-y-4">
-        <ResponsiveTable columns={tableColumns} rows={tableRows} />
+      <div className="w-full overflow-x-auto pb-24">
+        <table className="min-w-[900px] table-fixed text-sm md:text-base">
+          <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
+            <tr>
+              <th className="w-16 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                NUMERO
+              </th>
+              <th className="w-48 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                NOME
+              </th>
+              <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                RUOLO
+              </th>
+              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                U23
+              </th>
+              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                SC
+              </th>
+              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                CL
+              </th>
+              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                FM
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+            {giocatoriPrincipali.map((giocatore, i) => (
+              <tr key={giocatore.id} className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150">
+                <td className="px-3 py-3 text-center font-bold text-gray-900 dark:text-gray-100">
+                  {giocatore.numero || '-'}
+                </td>
+                <td className="px-3 py-3 text-gray-900 dark:text-gray-100">
+                  <EditableCell
+                    value={giocatore.nome}
+                    field="nome"
+                    giocatoreId={giocatore.id}
+                    onSave={handleUpdate}
+                    type="text"
+                  />
+                </td>
+                <td className="px-3 py-3">
+                  {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
+                </td>
+                <td className="px-3 py-3">
+                  {renderSelectCell(giocatore, 'u23', u23Options)}
+                </td>
+                <td className="px-3 py-3">
+                  <EditableCell
+                    value={giocatore.sc}
+                    field="sc"
+                    giocatoreId={giocatore.id}
+                    onSave={handleUpdate}
+                    type="text"
+                  />
+                </td>
+                <td className="px-3 py-3">
+                  <EditableCell
+                    value={giocatore.cl}
+                    field="cl"
+                    giocatoreId={giocatore.id}
+                    onSave={handleUpdate}
+                    type="number"
+                  />
+                </td>
+                <td className="px-3 py-3">
+                  <EditableCell
+                    value={giocatore.fm}
+                    field="fm"
+                    giocatoreId={giocatore.id}
+                    onSave={handleUpdate}
+                    type="number"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Extra players section */}
       {giocatoriExtra.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 text-center">
+        <div className="mt-8 pb-24">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">
             🎯 Giocatori Extra (29-30)
           </h3>
-          <div className="space-y-3">
-            {giocatoriExtra.map((giocatore) => (
-              <Card key={giocatore.id} className="p-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">Numero:</span>
-                      <span className="font-medium">{giocatore.numero || '-'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">Nome:</span>
-                      <div className="flex-1 ml-2">
-                        <EditableCell
-                          value={giocatore.nome}
-                          field="nome"
-                          giocatoreId={giocatore.id}
-                          onSave={handleUpdate}
-                          type="text"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">Ruolo:</span>
-                      <div className="flex-1 ml-2">
-                        {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">U23:</span>
-                      <div className="flex-1 ml-2">
-                        {renderSelectCell(giocatore, 'u23', u23Options)}
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">SC:</span>
-                      <div className="flex-1 ml-2">
-                        <EditableCell
-                          value={giocatore.sc}
-                          field="sc"
-                          giocatoreId={giocatore.id}
-                          onSave={handleUpdate}
-                          type="text"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">CL:</span>
-                      <div className="flex-1 ml-2">
-                        <EditableCell
-                          value={giocatore.cl}
-                          field="cl"
-                          giocatoreId={giocatore.id}
-                          onSave={handleUpdate}
-                          type="number"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-500 dark:text-zinc-400">FM:</span>
-                      <div className="flex-1 ml-2">
-                        <EditableCell
-                          value={giocatore.fm}
-                          field="fm"
-                          giocatoreId={giocatore.id}
-                          onSave={handleUpdate}
-                          type="number"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-[900px] table-fixed text-sm md:text-base">
+              <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
+                <tr>
+                  <th className="w-16 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    NUMERO
+                  </th>
+                  <th className="w-48 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    NOME
+                  </th>
+                  <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    RUOLO
+                  </th>
+                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    U23
+                  </th>
+                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    SC
+                  </th>
+                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    CL
+                  </th>
+                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    FM
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {giocatoriExtra.map((giocatore) => (
+                  <tr key={giocatore.id} className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150">
+                    <td className="px-3 py-3 text-center font-bold text-gray-900 dark:text-gray-100">
+                      {giocatore.numero || '-'}
+                    </td>
+                    <td className="px-3 py-3 text-gray-900 dark:text-gray-100">
+                      <EditableCell
+                        value={giocatore.nome}
+                        field="nome"
+                        giocatoreId={giocatore.id}
+                        onSave={handleUpdate}
+                        type="text"
+                      />
+                    </td>
+                    <td className="px-3 py-3">
+                      {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
+                    </td>
+                    <td className="px-3 py-3">
+                      {renderSelectCell(giocatore, 'u23', u23Options)}
+                    </td>
+                    <td className="px-3 py-3">
+                      <EditableCell
+                        value={giocatore.sc}
+                        field="sc"
+                        giocatoreId={giocatore.id}
+                        onSave={handleUpdate}
+                        type="text"
+                      />
+                    </td>
+                    <td className="px-3 py-3">
+                      <EditableCell
+                        value={giocatore.cl}
+                        field="cl"
+                        giocatoreId={giocatore.id}
+                        onSave={handleUpdate}
+                        type="number"
+                      />
+                    </td>
+                    <td className="px-3 py-3">
+                      <EditableCell
+                        value={giocatore.fm}
+                        field="fm"
+                        giocatoreId={giocatore.id}
+                        onSave={handleUpdate}
+                        type="number"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
