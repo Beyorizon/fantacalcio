@@ -12,13 +12,13 @@ export function ResponsiveTable({ columns, rows, className = '' }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.18, delay: i * 0.05 }}
         >
-          <Card className="hover:shadow-card transition-shadow duration-200">
+          <Card className="hover:shadow-md transition-shadow duration-200">
             {columns.map((col) => (
-              <div key={col.key} className="flex justify-between items-center py-2 border-b border-zinc-100 dark:border-zinc-700 last:border-b-0">
-                <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 capitalize">
+              <div key={col.key} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
                   {col.label}
                 </span>
-                <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {col.render ? col.render(row) : row[col.key] || '-'}
                 </div>
               </div>
@@ -33,29 +33,29 @@ export function ResponsiveTable({ columns, rows, className = '' }) {
   const DesktopView = () => (
     <div className="overflow-x-auto">
       <table className="min-w-full">
-        <thead className="sticky top-0 bg-white dark:bg-zinc-900 z-10">
+        <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
           <tr>
             {columns.map(col => (
               <th 
                 key={col.key} 
-                className="px-3 py-3 text-left text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-700"
+                className="px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800"
               >
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-700">
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {rows.map((row, i) => (
             <motion.tr 
               key={i} 
-              className="hover:bg-brand-50/40 dark:hover:bg-zinc-800/50 transition-colors duration-150"
+              className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.18, delay: i * 0.02 }}
             >
               {columns.map(col => (
-                <td key={col.key} className="px-3 py-3 text-sm text-zinc-900 dark:text-zinc-100">
+                <td key={col.key} className="px-3 py-3 text-sm text-gray-900 dark:text-gray-100">
                   {col.render ? col.render(row) : row[col.key] || '-'}
                 </td>
               ))}

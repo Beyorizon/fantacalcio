@@ -30,7 +30,7 @@ const TopBar = ({ title, right, className = '' }) => {
 
   return (
     <motion.header 
-      className={`sticky top-0 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-700 ${className}`}
+      className={`sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 ${className}`}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -38,7 +38,7 @@ const TopBar = ({ title, right, className = '' }) => {
       <div className="flex items-center justify-between px-4 py-3">
         {/* Title */}
         <motion.h1 
-          className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
+          className="text-lg font-bold text-gray-900 dark:text-gray-100"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
@@ -53,7 +53,7 @@ const TopBar = ({ title, right, className = '' }) => {
           {/* Dark mode toggle */}
           <motion.button
             onClick={toggleTheme}
-            className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors duration-200"
+            className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title={isDark ? 'Passa alla modalità chiara' : 'Passa alla modalità scura'}

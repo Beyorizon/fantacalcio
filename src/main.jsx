@@ -5,8 +5,7 @@ import App from './App.jsx';
 import Home from './pages/Home.jsx';
 import Rosa from './pages/Rosa.jsx';
 import Aggiornamenti from './pages/Aggiornamenti.jsx';
-import './App.css';
-import './styles/globals.css';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

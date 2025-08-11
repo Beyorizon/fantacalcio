@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-import { Link } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout';
+import TopBar from '../ui/TopBar';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import BottomNav from '../ui/BottomNav';
 
 export default function Home() {
   const [utenti, setUtenti] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUtenti = async () => {
@@ -27,25 +30,25 @@ export default function Home() {
 
   return (
     <AppLayout title="Lista Utenti">
-      <div className="space-y-4">
+      <div className="max-w-[480px] mx-auto p-4 space-y-3">
         {utenti.map((utente) => (
-          <Card key={utente.id} className="p-4 hover:shadow-card transition-shadow duration-200">
+          <Card key={utente.id} className="rounded-2xl shadow-soft hover:shadow-md transition">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                {utente.nome}
-              </h3>
-              <Link to={`/rosa/${utente.nome}`}>
-                <Button variant="primary" size="sm">
-                  Vedi Rosa
-                </Button>
-              </Link>
+              <div className="font-semibold">{utente.nome}</div>
+              <Button 
+                variant="primary" 
+                size="sm" 
+                onClick={() => navigate(`/rosa/${encodeURIComponent(utente.nome)}`)}
+              >
+                Vedi Rosa
+              </Button>
             </div>
           </Card>
         ))}
         
         {utenti.length === 0 && (
           <Card className="p-8 text-center">
-            <div className="text-zinc-500 dark:text-zinc-400 italic">
+            <div className="text-gray-500 dark:text-gray-400 italic">
               Nessun utente trovato.
             </div>
           </Card>

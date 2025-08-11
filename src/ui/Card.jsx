@@ -7,8 +7,8 @@ const Card = ({
   hover = false,
   ...props 
 }) => {
-  const baseClasses = 'rounded-2xl bg-white shadow-soft dark:bg-zinc-800';
-  const hoverClasses = hover ? 'hover:shadow-card transition-shadow duration-200' : '';
+  const baseClasses = 'rounded-2xl bg-white shadow-soft dark:bg-gray-800';
+  const hoverClasses = hover ? 'hover:shadow-md transition-shadow duration-200' : '';
   const classes = `${baseClasses} ${padding} ${hoverClasses} ${className}`;
 
   return (

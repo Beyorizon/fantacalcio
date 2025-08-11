@@ -1,32 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
-  content: ['./index.html','./src/**/*.{js,ts,jsx,tsx}'],
+  content: ['./index.html','./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       colors: {
         brand: {
-          50: '#F4F0FF',
-          100: '#E9E3FF',
-          200: '#D3C7FF',
-          300: '#BBA8FF',
-          400: '#A184FF',
-          500: '#8A63FF',
-          600: '#7C3AED', // primary
-          700: '#6D28D9',
-          800: '#5B21B6',
-          900: '#4C1D95',
-        },
+          50:'#F2EAFE',100:'#E6D4FD',200:'#C9A9FB',300:'#AC7EF9',
+          400:'#9054F7',500:'#7C3AED',600:'#622EBE',700:'#49238E',
+          800:'#31185F',900:'#1A0C31'
+        }
       },
-      borderRadius: {
-        xl: '1rem',
-        '2xl': '1.25rem',
-      },
-      boxShadow: {
-        card: '0 10px 25px rgba(124,58,237,.15)',
-        soft: '0 6px 16px rgba(0,0,0,.06)',
-      },
-    },
+      borderRadius: { '2xl': '1.25rem' },
+      boxShadow: { soft: '0 8px 24px rgba(124,58,237,0.15)' }
+    }
   },
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
-}
+  plugins: [],
+};

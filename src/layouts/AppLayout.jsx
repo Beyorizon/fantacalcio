@@ -3,9 +3,11 @@ import BottomNav from '../ui/BottomNav';
 
 const AppLayout = ({ title, right, children }) => {
   return (
-    <div className="app-container min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="app-container min-h-screen bg-gray-50 dark:bg-gray-950">
       <TopBar title={title} right={right} />
-      <main className="pb-24 pt-3">{children}</main>
+      <main className="pt-[env(safe-area-inset-top)] pb-[calc(env(safe-area-inset-bottom)+64px)]">
+        {children}
+      </main>
       <BottomNav />
     </div>
   );
