@@ -1,16 +1,23 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
-const navItems = [
-  { path: '/', label: 'Home', icon: '🏠' },
-  { path: '/news', label: 'News', icon: '📰' },
-  { path: '/regolamento', label: 'Regolamento', icon: '📖' },
-  { path: '/scambi', label: 'Scambi', icon: '🤝' },
-  { path: '/login', label: 'Login', icon: '🔐' }
-];
+import { useAuth } from '../context/AuthContext';
 
 const BottomNav = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const navItems = [
+    { path: '/', label: 'Home', icon: '🏠' },
+    { path: '/news', label: 'News', icon: '📰' },
+    { path: '/regolamento', label: 'Regolamento', icon: '📖' },
+    { path: '/scambi', label: 'Scambi', icon: '🤝' },
+    { 
+      path: user ? '/logout' : '/login', 
+      label: user ? 'Logout' : 'Login', 
+      icon: user ? '🚪' : '🔐',
+      isAuth: true
+    }
+  ];
 
   return (
     <motion.nav 
@@ -23,6 +30,31 @@ const BottomNav = () => {
         <div className="flex items-center justify-around py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
+            
+            if (item.isAuth && user) {
+              // Per logout, usa un button invece di Link
+              return (
+                <motion.button
+                  key={item.path}
+                  onClick={() => {
+                    // Il logout è gestito dalla TopBar, qui reindirizziamo alla home
+                    window.location.href = '/';
+                  }}
+                  className="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200"
+                >
+                  <motion.div
+                    className="text-2xl mb-1 scale-100"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {item.icon}
+                  </motion.div>
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {item.label}
+                  </span>
+                </motion.button>
+              );
+            }
             
             return (
               <Link

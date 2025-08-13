@@ -9,22 +9,47 @@ import News from './pages/News.jsx';
 import Regolamento from './pages/Regolamento.jsx';
 import Scambi from './pages/Scambi.jsx';
 import Login from './pages/Login.jsx';
+import { AuthProvider } from './context/AuthContext';
+import { RefreshActionProvider } from './hooks/useRefreshAction';
+import ProtectedRoute from './routes/ProtectedRoute';
+import AdminRoute from './routes/AdminRoute';
 import './index.css';
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({ immediate: true });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="rosa/:utenteId" element={<Rosa />} />
-          <Route path="aggiornamenti" element={<Aggiornamenti />} />
-          <Route path="news" element={<News />} />
-          <Route path="regolamento" element={<Regolamento />} />
-          <Route path="scambi" element={<Scambi />} />
-          <Route path="login" element={<Login />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <RefreshActionProvider>
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route index element={<Home />} />
+              {/* Rotte protette - richiedono autenticazione */}
+              <Route path="rosa/:utenteId" element={
+                <ProtectedRoute><Rosa /></ProtectedRoute>
+              } />
+              {/* Rotte pubbliche */}
+              <Route path="aggiornamenti" element={<Aggiornamenti />} />
+              <Route path="news" element={<News />} />
+              <Route path="regolamento" element={<Regolamento />} />
+              <Route path="scambi" element={<Scambi />} />
+              <Route path="login" element={<Login />} />
+              
+              {/* Esempio di rotte admin (commentate per ora) */}
+              {/* 
+              <Route path="admin/news" element={
+                <AdminRoute><Aggiornamenti /></AdminRoute>
+              } />
+              <Route path="admin/regolamento" element={
+                <AdminRoute><Regolamento /></AdminRoute>
+              } />
+              */}
+            </Route>
+          </Routes>
+        </RefreshActionProvider>
+      </AuthProvider>
     </HashRouter>
   </React.StrictMode>
 );

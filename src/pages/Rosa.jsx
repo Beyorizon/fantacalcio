@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
-import AppLayout from '../layouts/AppLayout';
 import Toast from '../ui/Toast';
+import { useRefreshAction } from '../hooks/useRefreshAction';
 
 // Predefined role options
 const ruoloOptions = [
@@ -81,6 +81,7 @@ export default function Rosa() {
   const [nomeUtente, setNomeUtente] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   const [updatingTotale, setUpdatingTotale] = useState(false);
+  const { setRefreshActionForPage, clearRefreshAction } = useRefreshAction();
 
   useEffect(() => {
     const fetchDati = async () => {
@@ -102,6 +103,19 @@ export default function Rosa() {
 
     fetchDati();
   }, [utenteId]);
+
+  // Imposta l'azione di refresh quando il componente si monta
+  useEffect(() => {
+    setRefreshActionForPage({
+      onClick: handleAggiornaTotale,
+      loading: updatingTotale
+    });
+
+    // Pulisce l'azione quando il componente si smonta
+    return () => {
+      clearRefreshAction();
+    };
+  }, [updatingTotale, setRefreshActionForPage, clearRefreshAction]);
 
   // Ordinamento giocatori
   const rosaOrdinata = [...rosa].sort((a, b) => {
@@ -188,13 +202,7 @@ export default function Rosa() {
   };
 
   return (
-    <AppLayout 
-      title={`Rosa di ${nomeUtente}`}
-      refreshAction={{
-        onClick: handleAggiornaTotale,
-        loading: updatingTotale
-      }}
-    >
+    <>
       {/* Toast notifications */}
       <Toast
         message={toast.message}
@@ -373,6 +381,6 @@ export default function Rosa() {
           </div>
         </div>
       )}
-    </AppLayout>
+    </>
   );
 }

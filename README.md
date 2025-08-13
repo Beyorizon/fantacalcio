@@ -1,12 +1,21 @@
-# React + Vite
+# Fantacalcio Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+App React (Vite) per gestire rose, news, regolamento e scambi.
 
-Currently, two official plugins are available:
+## PWA
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+L'app è installabile (Android + iOS) e funziona offline per shell UI + risorse recenti.
 
-## Expanding the ESLint configuration
+- Manifest generato con `vite-plugin-pwa` (config in `vite.config.js`)
+- Service Worker registrato in `src/main.jsx`
+- Icone (maskable e apple-touch) in `public/icons/`
+- Meta tag iOS in `index.html`
+- Bottone “Installa” in `src/components/InstallButton.jsx` incluso nella `TopBar`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Test
+
+1. `npm run build` e `npm run preview`
+2. DevTools → Lighthouse → PWA ≥ 90
+3. Application → Manifest: icone/display/start_url OK
+4. Application → Service Workers: attivo e "Claimed"
+

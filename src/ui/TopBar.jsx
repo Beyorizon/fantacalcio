@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import InstallButton from '../components/InstallButton';
 
 const TopBar = ({ title, right, refreshAction, className = '' }) => {
   const [isDark, setIsDark] = useState(false);
+  const { user, isAdmin, logout } = useAuth();
 
   useEffect(() => {
     // Check for saved theme preference or default to light mode
@@ -28,6 +32,14 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <motion.header 
       className={`sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 ${className}`}
@@ -49,6 +61,49 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
         {/* Right side actions */}
         <div className="flex items-center gap-3">
           {right}
+          
+          {/* Admin badge */}
+          {isAdmin && (
+            <motion.span 
+              className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              Admin
+            </motion.span>
+          )}
+          
+          {/* Auth buttons */}
+          {!user ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Link 
+                to="/login" 
+                className="text-sm px-3 py-1 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors duration-200"
+              >
+                Login
+              </Link>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <button 
+                onClick={handleLogout} 
+                className="text-sm px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              >
+                Logout
+              </button>
+            </motion.div>
+          )}
+          
+          <InstallButton />
           
           {/* Refresh button - only show when refreshAction is provided */}
           {refreshAction && (
