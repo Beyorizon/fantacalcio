@@ -3,6 +3,7 @@ import { supabase } from '../services/supabase';
 import { useParams } from 'react-router-dom';
 import Toast from '../ui/Toast';
 import { useRefreshAction } from '../hooks/useRefreshAction';
+import { useAuth } from '../context/AuthContext';
 
 // Predefined role options
 const ruoloOptions = [
@@ -15,7 +16,7 @@ const ruoloOptions = [
 const u23Options = ["", "Si", "No"];
 
 // EditableCell component for inline editing
-const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
+const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text', isAdmin = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value || '');
 
@@ -48,6 +49,15 @@ const EditableCell = ({ value, field, giocatoreId, onSave, type = 'text' }) => {
   const handleBlur = () => {
     handleSave();
   };
+
+  // Se non è admin, mostra solo il valore senza possibilità di modifica
+  if (!isAdmin) {
+    return (
+      <span className="inline-block w-full px-2 py-1 min-h-[32px] flex items-center">
+        {value || '-'}
+      </span>
+    );
+  }
 
   if (isEditing) {
     return (
@@ -82,6 +92,7 @@ export default function Rosa() {
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   const [updatingTotale, setUpdatingTotale] = useState(false);
   const { setRefreshActionForPage, clearRefreshAction } = useRefreshAction();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchDati = async () => {
@@ -104,18 +115,22 @@ export default function Rosa() {
     fetchDati();
   }, [utenteId]);
 
-  // Imposta l'azione di refresh quando il componente si monta
+  // Imposta l'azione di refresh quando il componente si monta (solo per admin)
   useEffect(() => {
-    setRefreshActionForPage({
-      onClick: handleAggiornaTotale,
-      loading: updatingTotale
-    });
+    if (isAdmin) {
+      setRefreshActionForPage({
+        onClick: handleAggiornaTotale,
+        loading: updatingTotale
+      });
+    } else {
+      clearRefreshAction();
+    }
 
     // Pulisce l'azione quando il componente si smonta
     return () => {
       clearRefreshAction();
     };
-  }, [updatingTotale, setRefreshActionForPage, clearRefreshAction]);
+  }, [updatingTotale, setRefreshActionForPage, clearRefreshAction, isAdmin]);
 
   // Ordinamento giocatori
   const rosaOrdinata = [...rosa].sort((a, b) => {
@@ -150,20 +165,32 @@ export default function Rosa() {
     }
   };
 
-  const renderSelectCell = (giocatore, campo, options) => (
-    <select
-      value={giocatore[campo] || ""}
-      onChange={(e) => handleUpdate(giocatore.id, campo, e.target.value)}
-      className="w-full rounded-lg border px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 cursor-pointer"
-      aria-label={`${campo} riga ${giocatore.id}`}
-    >
-      {options.map(opt => (
-        <option key={opt} value={opt}>
-          {opt === "" ? "-" : opt}
-        </option>
-      ))}
-    </select>
-  );
+  const renderSelectCell = (giocatore, campo, options) => {
+    // Se non è admin, mostra solo il valore senza possibilità di modifica
+    if (!isAdmin) {
+      return (
+        <span className="inline-block w-full px-2 py-1 min-h-[32px] flex items-center">
+          {giocatore[campo] || '-'}
+        </span>
+      );
+    }
+    
+    // Se è admin, mostra il select per la modifica
+    return (
+      <select
+        value={giocatore[campo] || ""}
+        onChange={(e) => handleUpdate(giocatore.id, campo, e.target.value)}
+        className="w-full rounded-lg border px-2 py-1 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 cursor-pointer"
+        aria-label={`${campo} riga ${giocatore.id}`}
+      >
+        {options.map(opt => (
+          <option key={opt} value={opt}>
+            {opt === "" ? "-" : opt}
+          </option>
+        ))}
+      </select>
+    );
+  };
 
   // Aggiorna totale function
   const handleAggiornaTotale = async () => {
@@ -252,6 +279,7 @@ export default function Rosa() {
                     giocatoreId={giocatore.id}
                     onSave={handleUpdate}
                     type="text"
+                    isAdmin={isAdmin}
                   />
                 </td>
                 <td className="px-3 py-3">
@@ -267,6 +295,7 @@ export default function Rosa() {
                     giocatoreId={giocatore.id}
                     onSave={handleUpdate}
                     type="text"
+                    isAdmin={isAdmin}
                   />
                 </td>
                 <td className="px-3 py-3">
@@ -276,6 +305,7 @@ export default function Rosa() {
                     giocatoreId={giocatore.id}
                     onSave={handleUpdate}
                     type="number"
+                    isAdmin={isAdmin}
                   />
                 </td>
                 <td className="px-3 py-3">
@@ -285,6 +315,7 @@ export default function Rosa() {
                     giocatoreId={giocatore.id}
                     onSave={handleUpdate}
                     type="number"
+                    isAdmin={isAdmin}
                   />
                 </td>
               </tr>
@@ -339,6 +370,7 @@ export default function Rosa() {
                         giocatoreId={giocatore.id}
                         onSave={handleUpdate}
                         type="text"
+                        isAdmin={isAdmin}
                       />
                     </td>
                     <td className="px-3 py-3">
@@ -354,6 +386,7 @@ export default function Rosa() {
                         giocatoreId={giocatore.id}
                         onSave={handleUpdate}
                         type="text"
+                        isAdmin={isAdmin}
                       />
                     </td>
                     <td className="px-3 py-3">
@@ -363,6 +396,7 @@ export default function Rosa() {
                         giocatoreId={giocatore.id}
                         onSave={handleUpdate}
                         type="number"
+                        isAdmin={isAdmin}
                       />
                     </td>
                     <td className="px-3 py-3">
@@ -372,6 +406,7 @@ export default function Rosa() {
                         giocatoreId={giocatore.id}
                         onSave={handleUpdate}
                         type="number"
+                        isAdmin={isAdmin}
                       />
                     </td>
                   </tr>
