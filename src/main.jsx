@@ -25,16 +25,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <RefreshActionProvider>
           <Routes>
             <Route path="/" element={<App />}>
-              <Route index element={<Home />} />
+              <Route index element={<ProtectedRoute allowPublicAccess={true}><Home /></ProtectedRoute>} />
               {/* Rotte protette - richiedono autenticazione */}
               <Route path="rosa/:utenteId" element={
                 <ProtectedRoute><Rosa /></ProtectedRoute>
               } />
               {/* Rotte pubbliche */}
-              <Route path="aggiornamenti" element={<Aggiornamenti />} />
-              <Route path="news" element={<News />} />
-              <Route path="regolamento" element={<Regolamento />} />
-              <Route path="scambi" element={<Scambi />} />
+              <Route path="aggiornamenti" element={<ProtectedRoute allowPublicAccess={true}><Aggiornamenti /></ProtectedRoute>} />
+              <Route path="news" element={<ProtectedRoute allowPublicAccess={true}><News /></ProtectedRoute>} />
+              <Route path="regolamento" element={<ProtectedRoute allowPublicAccess={true}><Regolamento /></ProtectedRoute>} />
+              <Route path="scambi" element={<ProtectedRoute allowPublicAccess={true}><Scambi /></ProtectedRoute>} />
               <Route path="login" element={<Login />} />
               
               {/* Rotte admin - richiedono autenticazione e privilegi admin */}

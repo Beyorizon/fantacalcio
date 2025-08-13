@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext';
  * @returns {React.ReactNode} Il componente children se l'utente è autenticato, altrimenti un reindirizzamento
  */
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, allowPublicAccess = false }) {
   const { user, loading } = useAuth();
   
   // Durante il caricamento dello stato di autenticazione, non mostrare nulla
@@ -18,6 +18,7 @@ export default function ProtectedRoute({ children }) {
   if (loading) return null;
   
   // Se l'utente è autenticato, mostra il contenuto protetto
+  // Se allowPublicAccess è true, mostra il contenuto anche senza autenticazione
   // Altrimenti, reindirizza alla pagina di login
-  return user ? children : <Navigate to="/login" replace />;
+  return user || allowPublicAccess ? children : <Navigate to="/login" replace />;
 }

@@ -5,12 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabase';
 import Button from '../ui/Button';
 import Toast from '../ui/Toast';
+import { Navigate } from 'react-router-dom';
 
 export default function Aggiornamenti() {
   const [aggiornamenti, setAggiornamenti] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
-  const { isAdmin } = useAuth();
+  const { isAdmin, user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     const fetchAggiornamenti = async () => {
