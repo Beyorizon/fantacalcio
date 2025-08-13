@@ -4,6 +4,19 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import InstallButton from '../components/InstallButton';
 
+/**
+ * Componente barra superiore dell'applicazione.
+ * Gestisce il titolo della pagina, tema chiaro/scuro, autenticazione e azioni di refresh.
+ * 
+ * @param {Object} props - Proprietà del componente
+ * @param {string} props.title - Titolo da mostrare nella barra
+ * @param {React.ReactNode} props.right - Elementi aggiuntivi da mostrare a destra
+ * @param {Object} props.refreshAction - Configurazione per l'azione di refresh
+ * @param {Function} props.refreshAction.onClick - Funzione da chiamare al click sul pulsante refresh
+ * @param {boolean} props.refreshAction.loading - Stato di caricamento dell'azione di refresh
+ * @param {string} props.className - Classi CSS aggiuntive
+ */
+
 const TopBar = ({ title, right, refreshAction, className = '' }) => {
   const [isDark, setIsDark] = useState(false);
   const { user, isAdmin, logout } = useAuth();
@@ -19,6 +32,10 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
     }
   }, []);
 
+  /**
+   * Alterna tra tema chiaro e scuro.
+   * Aggiorna sia lo stato locale che il localStorage per persistenza.
+   */
   const toggleTheme = () => {
     const newTheme = !isDark;
     setIsDark(newTheme);
@@ -32,6 +49,10 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
     }
   };
 
+  /**
+   * Gestisce il processo di logout.
+   * Utilizza la funzione logout dal context di autenticazione e gestisce eventuali errori.
+   */
   const handleLogout = async () => {
     try {
       await logout();

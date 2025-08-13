@@ -2,9 +2,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * Componente di navigazione inferiore dell'applicazione.
+ * Mostra i link principali e gestisce il logout in modo coerente con TopBar.
+ */
+
 const BottomNav = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { path: '/', label: 'Home', icon: '🏠' },
@@ -36,9 +41,13 @@ const BottomNav = () => {
               return (
                 <motion.button
                   key={item.path}
-                  onClick={() => {
-                    // Il logout è gestito dalla TopBar, qui reindirizziamo alla home
-                    window.location.href = '/';
+                  onClick={async () => {
+                    try {
+                      await logout();
+                      // Non è necessario reindirizzare manualmente, AuthContext gestirà lo stato
+                    } catch (error) {
+                      console.error('Logout failed:', error);
+                    }
                   }}
                   className="flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-200"
                 >

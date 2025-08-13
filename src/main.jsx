@@ -37,15 +37,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <Route path="scambi" element={<Scambi />} />
               <Route path="login" element={<Login />} />
               
-              {/* Esempio di rotte admin (commentate per ora) */}
-              {/* 
+              {/* Rotte admin - richiedono autenticazione e privilegi admin */}
               <Route path="admin/news" element={
                 <AdminRoute><Aggiornamenti /></AdminRoute>
               } />
               <Route path="admin/regolamento" element={
                 <AdminRoute><Regolamento /></AdminRoute>
               } />
-              */}
+              <Route path="admin/scambi" element={
+                <AdminRoute><Scambi /></AdminRoute>
+              } />
             </Route>
           </Routes>
         </RefreshActionProvider>
