@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['vite.svg', 'icons/apple-touch-icon.png', 'robots.txt'],
       manifest: {
-        name: 'Fantacalcio Beyorizons',
+        name: 'Fantacalcio Linus',
         short_name: 'Fantacalcio',
         description: 'Gestione rose, news, regolamento e scambi.',
         start_url: '/',

@@ -240,28 +240,28 @@ export default function Rosa() {
 
       {/* Main roster table */}
       <div className="w-full overflow-x-auto pb-24">
-        <table className="min-w-[900px] table-fixed text-sm md:text-base">
+        <table className="min-w-[320px] table-fixed text-xs sm:text-sm">
           <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
             <tr>
-              <th className="w-16 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
-                NUMERO
+              <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                N°
               </th>
-              <th className="w-48 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-32 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 NOME
               </th>
-              <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-16 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 RUOLO
               </th>
-              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 U23
               </th>
-              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 SC
               </th>
-              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 CL
               </th>
-              <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+              <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 FM
               </th>
             </tr>
@@ -269,10 +269,10 @@ export default function Rosa() {
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {giocatoriPrincipali.map((giocatore, i) => (
               <tr key={giocatore.id} className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150">
-                <td className="px-3 py-3 text-center font-bold text-gray-900 dark:text-gray-100">
+                <td className="px-1 py-2 text-center font-bold text-gray-900 dark:text-gray-100 text-xs">
                   {giocatore.numero || '-'}
                 </td>
-                <td className="px-3 py-3 text-gray-900 dark:text-gray-100">
+                <td className="px-1 py-2 text-gray-900 dark:text-gray-100">
                   <EditableCell
                     value={giocatore.nome}
                     field="nome"
@@ -282,13 +282,13 @@ export default function Rosa() {
                     isAdmin={isAdmin}
                   />
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-1 py-2">
                   {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-1 py-2">
                   {renderSelectCell(giocatore, 'u23', u23Options)}
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-1 py-2">
                   <EditableCell
                     value={giocatore.sc}
                     field="sc"
@@ -298,7 +298,7 @@ export default function Rosa() {
                     isAdmin={isAdmin}
                   />
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-1 py-2">
                   <EditableCell
                     value={giocatore.cl}
                     field="cl"
@@ -308,7 +308,7 @@ export default function Rosa() {
                     isAdmin={isAdmin}
                   />
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-1 py-2">
                   <EditableCell
                     value={giocatore.fm}
                     field="fm"
@@ -331,28 +331,28 @@ export default function Rosa() {
             🎯 Giocatori Extra (29-30)
           </h3>
           <div className="w-full overflow-x-auto">
-            <table className="min-w-[900px] table-fixed text-sm md:text-base">
+            <table className="min-w-[320px] table-fixed text-xs sm:text-sm">
               <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
                 <tr>
-                  <th className="w-16 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
-                    NUMERO
+                  <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                    N°
                   </th>
-                  <th className="w-48 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-32 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     NOME
                   </th>
-                  <th className="w-24 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-16 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     RUOLO
                   </th>
-                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     U23
                   </th>
-                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     SC
                   </th>
-                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     CL
                   </th>
-                  <th className="w-20 px-3 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     FM
                   </th>
                 </tr>
@@ -360,10 +360,10 @@ export default function Rosa() {
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {giocatoriExtra.map((giocatore) => (
                   <tr key={giocatore.id} className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150">
-                    <td className="px-3 py-3 text-center font-bold text-gray-900 dark:text-gray-100">
+                    <td className="px-1 py-2 text-center font-bold text-gray-900 dark:text-gray-100 text-xs">
                       {giocatore.numero || '-'}
                     </td>
-                    <td className="px-3 py-3 text-gray-900 dark:text-gray-100">
+                    <td className="px-1 py-2 text-gray-900 dark:text-gray-100">
                       <EditableCell
                         value={giocatore.nome}
                         field="nome"
@@ -373,13 +373,13 @@ export default function Rosa() {
                         isAdmin={isAdmin}
                       />
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-1 py-2">
                       {renderSelectCell(giocatore, 'ruolo', ruoloOptions)}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-1 py-2">
                       {renderSelectCell(giocatore, 'u23', u23Options)}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-1 py-2">
                       <EditableCell
                         value={giocatore.sc}
                         field="sc"
@@ -389,7 +389,7 @@ export default function Rosa() {
                         isAdmin={isAdmin}
                       />
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-1 py-2">
                       <EditableCell
                         value={giocatore.cl}
                         field="cl"
@@ -399,7 +399,7 @@ export default function Rosa() {
                         isAdmin={isAdmin}
                       />
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-1 py-2">
                       <EditableCell
                         value={giocatore.fm}
                         field="fm"

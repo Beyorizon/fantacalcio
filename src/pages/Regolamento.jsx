@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import AppLayout from '../layouts/AppLayout';
 import Card from '../ui/Card';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabase';
@@ -52,7 +51,7 @@ export default function Regolamento() {
   };
 
   return (
-    <AppLayout title="Regolamento">
+    <>
       <Toast
         message={toast.message}
         type={toast.type}
@@ -115,6 +114,6 @@ export default function Regolamento() {
           ))}
         </Card>
       )}
-    </AppLayout>
+    </>
   );
 }

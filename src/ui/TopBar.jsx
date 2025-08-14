@@ -95,21 +95,8 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
             </motion.span>
           )}
           
-          {/* Auth buttons */}
-          {!user ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Link 
-                to="/login" 
-                className="text-sm px-3 py-1 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors duration-200"
-              >
-                Login
-              </Link>
-            </motion.div>
-          ) : (
+          {/* User info - show logout only for authenticated users */}
+          {user && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
