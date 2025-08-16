@@ -235,7 +235,7 @@ export default function Rosa() {
       />
 
       {/* Main roster table */}
-      <div className="w-full overflow-x-auto pb-24 pl-5 pr-5">
+      <div className="w-full overflow-x-auto pb-15 pl-5 pr-5">
         <table className="min-w-[320px] table-fixed text-xs sm:text-sm">
           <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
             <tr>
@@ -322,8 +322,8 @@ export default function Rosa() {
 
       {/* Extra players section */}
       {giocatoriExtra.length > 0 && (
-        <div className="mt-8 pb-24 pl-5 pr-5">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">
+        <div className="mt-8 pb-20 pl-5 pr-5">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-left">
             🎯 Giocatori Extra (29-30)
           </h3>
           <div className="w-full overflow-x-auto">
