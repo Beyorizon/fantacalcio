@@ -10,7 +10,7 @@ const ruoloOptions = [
   "Por", "DC", "DD E", "DS E", "DC DS E", "DD DS E", "DC DS", "DC DD",
   "B DS E", "B DD E", "E", "EW", "EM", "EC",
   "M", "MC", "C", "CT", "CW", "CWT",
-  "T", "W", "WT", "WA", "TA", "A", "Pc"
+  "T", "W", "WT", "WA", "TA", "A", "Pc", "-"
 ];
 
 const u23Options = ["", "Si", "No"];
@@ -103,13 +103,9 @@ export default function Rosa() {
 
       if (giocatori) setRosa(giocatori);
 
-      const { data: utente } = await supabase
-        .from('utenti')
-        .select('nome')
-        .eq('nome', utenteId)
-        .single();
-
-      if (utente) setNomeUtente(utente.nome);
+      // Decodifica il nome utente per evitare %20
+      const nomeDecodificato = decodeURIComponent(utenteId);
+      setNomeUtente(nomeDecodificato);
     };
 
     fetchDati();
@@ -249,7 +245,7 @@ export default function Rosa() {
               <th className="w-32 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 NOME
               </th>
-              <th className="w-16 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+               <th className="w-20 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                 RUOLO
               </th>
               <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
@@ -326,7 +322,7 @@ export default function Rosa() {
 
       {/* Extra players section */}
       {giocatoriExtra.length > 0 && (
-        <div className="mt-8 pb-24">
+        <div className="mt-8 pb-24 pl-5 pr-5">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">
             🎯 Giocatori Extra (29-30)
           </h3>
@@ -340,7 +336,7 @@ export default function Rosa() {
                   <th className="w-32 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     NOME
                   </th>
-                  <th className="w-16 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                  <th className="w-20 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
                     RUOLO
                   </th>
                   <th className="w-12 px-1 py-2 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
