@@ -264,7 +264,13 @@ export default function Rosa() {
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {giocatoriPrincipali.map((giocatore, i) => (
-              <tr key={giocatore.id} className="hover:bg-brand-50/40 dark:hover:bg-gray-800/50 transition-colors duration-150">
+              <tr
+  key={giocatore.id}
+  className={`transition-colors duration-150 
+    hover:bg-brand-50/40 dark:hover:bg-gray-800/50 
+    ${giocatore.u23 === "Si" ? "bg-blue-100 dark:bg-blue-900" : ""}
+  `}
+>
                 <td className="px-1 py-2 text-center font-bold text-gray-900 dark:text-gray-100 text-xs">
                   {giocatore.numero || '-'}
                 </td>
