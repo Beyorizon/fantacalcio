@@ -11,8 +11,6 @@ export default function App() {
     switch (pathname) {
       case '/':
         return 'Fantacalcio';
-      case '/aggiornamenti':
-        return 'Aggiornamenti';
       case '/news':
         return 'News';
       case '/regolamento':

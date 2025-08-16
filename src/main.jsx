@@ -4,7 +4,6 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import App from './App.jsx';
 import Home from './pages/Home.jsx';
 import Rosa from './pages/Rosa.jsx';
-import Aggiornamenti from './pages/Aggiornamenti.jsx';
 import News from './pages/News.jsx';
 import Regolamento from './pages/Regolamento.jsx';
 import Scambi from './pages/Scambi.jsx';
@@ -29,7 +28,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               {/* Rotte protette - richiedono autenticazione */}
               <Route path="rosa/:utenteId" element={<Rosa />} />
               {/* Rotte pubbliche */}
-              <Route path="aggiornamenti" element={<Aggiornamenti />} />
               <Route path="news" element={<News />} />
               <Route path="regolamento" element={<Regolamento />} />
               <Route path="scambi" element={<Scambi />} />
@@ -37,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               
               {/* Rotte admin - richiedono autenticazione e privilegi admin */}
               <Route path="admin/news" element={
-                <AdminRoute><Aggiornamenti /></AdminRoute>
+                <AdminRoute><News /></AdminRoute>
               } />
               <Route path="admin/regolamento" element={
                 <AdminRoute><Regolamento /></AdminRoute>

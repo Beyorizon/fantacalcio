@@ -18,7 +18,7 @@ export default function Regolamento() {
         const { data, error } = await supabase
           .from('regolamento')
           .select('*')
-          .order('ordine', { ascending: true });
+          .order('id', { ascending: true });
 
         if (error) throw error;
         setRegolamenti(data || []);
@@ -48,6 +48,7 @@ export default function Regolamento() {
       console.error('Errore nell\'eliminazione della regola:', error);
       setToast({ show: true, message: 'Errore nell\'eliminazione della regola', type: 'error' });
     }
+    
   };
 
   return (
@@ -79,11 +80,7 @@ export default function Regolamento() {
           <p className="text-gray-600 dark:text-gray-400">Nessuna regola disponibile.</p>
         </Card>
       ) : (
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Regolamento
-          </h2>
-          
+        <Card className="p-6">       
           {regolamenti.map(regola => (
             <div key={regola.id} className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0">
               <div className="flex justify-between items-start">
@@ -107,7 +104,7 @@ export default function Regolamento() {
                   </div>
                 )}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">
+              <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line">
                 {regola.contenuto}
               </div>
             </div>

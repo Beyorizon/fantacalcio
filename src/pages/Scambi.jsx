@@ -17,8 +17,8 @@ export default function Scambi() {
         setLoading(true);
         const { data, error } = await supabase
           .from('scambi')
-          .select('*, utente_cedente(*), utente_ricevente(*)')
-          .order('data', { ascending: false });
+          .select('utente_cedente, utente_ricevente, note, giocatori_ricevuti, giocatori_ceduti')
+          .order('id', { ascending: false });
 
         if (error) throw error;
         setScambi(data || []);
@@ -83,7 +83,7 @@ export default function Scambi() {
           <Card key={scambio.id} className="p-6 mb-4">
             <div className="flex justify-between items-start">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Scambio: {scambio.utente_cedente?.nome} ↔ {scambio.utente_ricevente?.nome}
+                Scambio: {scambio.utente_cedente} ↔ {scambio.utente_ricevente}
               </h2>
               {isAdmin && (
                 <div className="flex space-x-2">
@@ -103,12 +103,12 @@ export default function Scambi() {
               )}
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              {new Date(scambio.data).toLocaleDateString('it-IT')}
+               {new Date(scambio.created_at).toLocaleDateString("it-IT")}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-                  {scambio.utente_cedente?.nome} cede:
+                  {scambio.utente_cedente} cede:
                 </h3>
                 <div className="text-gray-600 dark:text-gray-400">
                   {scambio.giocatori_ceduti}
@@ -116,7 +116,7 @@ export default function Scambi() {
               </div>
               <div>
                 <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-                  {scambio.utente_ricevente?.nome} cede:
+                  {scambio.utente_ricevente} cede:
                 </h3>
                 <div className="text-gray-600 dark:text-gray-400">
                   {scambio.giocatori_ricevuti}

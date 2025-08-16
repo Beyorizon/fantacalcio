@@ -16,9 +16,10 @@ export default function News() {
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('news')
+          .from('aggiornamenti')
           .select('*')
-          .order('data', { ascending: false });
+          .order('created_at', { ascending: false });
+
 
         if (error) throw error;
         setNews(data || []);
@@ -36,7 +37,7 @@ export default function News() {
   const handleDelete = async (id) => {
     try {
       const { error } = await supabase
-        .from('news')
+        .from('aggiornamenti')
         .delete()
         .eq('id', id);
 
@@ -58,7 +59,7 @@ export default function News() {
         isVisible={toast.show}
         onClose={() => setToast({ show: false, message: '', type: 'info' })}
       />
-      
+    
       {isAdmin && (
         <div className="mb-4 flex justify-end">
           <Button
@@ -81,6 +82,9 @@ export default function News() {
       ) : (
         news.map(item => (
           <Card key={item.id} className="p-6 mb-4">
+             <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              {new Date(item.created_at).toLocaleDateString("it-IT")}
+            </p>
             <div className="flex justify-between items-start">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {item.titolo}
@@ -102,9 +106,6 @@ export default function News() {
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              {new Date(item.data).toLocaleDateString('it-IT')}
-            </p>
             <div className="text-gray-600 dark:text-gray-400">
               {item.contenuto}
             </div>
