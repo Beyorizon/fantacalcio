@@ -10,6 +10,8 @@ export default function Regolamento() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   const { isAdmin } = useAuth();
+  const [open, setOpen] = useState(false); // stato per apertura/chiusura
+  const [openId, setOpenId] = useState(null);
 
   useEffect(() => {
     const fetchRegolamenti = async () => {
@@ -80,36 +82,32 @@ export default function Regolamento() {
           <p className="text-gray-600 dark:text-gray-400">Nessuna regola disponibile.</p>
         </Card>
       ) : (
-        <Card className="p-6">       
-          {regolamenti.map(regola => (
-            <div key={regola.id} className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0">
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                  {regola.titolo}
-                </h3>
-                {isAdmin && (
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => alert(`Modifica regola ${regola.id}`)}
-                      className="bg-amber-500 hover:bg-amber-600 text-white text-sm px-2 py-1"
-                    >
-                      Modifica
-                    </Button>
-                    <Button
-                      onClick={() => handleDelete(regola.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white text-sm px-2 py-1"
-                    >
-                      Elimina
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line">
-                {regola.contenuto}
-              </div>
-            </div>
-          ))}
-        </Card>
+<Card className="p-6">
+  {regolamenti.map(regola => (
+    <div
+      key={regola.id}
+      className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0"
+    >
+      <div
+        className="flex justify-between items-start cursor-pointer"
+        onClick={() => setOpenId(openId === regola.id ? null : regola.id)}
+      >
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          {regola.titolo}
+        </h3>
+        <span className="text-gray-500">
+          {openId === regola.id ? "▲" : "▼"}
+        </span>
+      </div>
+
+      {openId === regola.id && (
+        <div className="text-gray-600 dark:text-gray-400 whitespace-pre-line mt-2">
+          {regola.contenuto}
+        </div>
+      )}
+    </div>
+  ))}
+</Card>
       )}
     </>
   );
