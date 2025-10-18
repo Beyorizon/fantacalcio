@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import InstallButton from '../components/InstallButton';
 
@@ -20,6 +20,8 @@ import InstallButton from '../components/InstallButton';
 const TopBar = ({ title, right, refreshAction, className = '' }) => {
   const [isDark, setIsDark] = useState(false);
   const { user, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check for saved theme preference or default to light mode
@@ -61,6 +63,20 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
     }
   };
 
+  /**
+   * Gestisce la navigazione indietro.
+   * Utilizza la history del browser per tornare alla pagina precedente.
+   */
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  /**
+   * Determina se mostrare il pulsante indietro.
+   * Il pulsante viene mostrato solo se non si è nella home page.
+   */
+  const shouldShowBackButton = location.pathname !== '/';
+
   return (
     <motion.header 
       className={`sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 ${className}`}
@@ -69,15 +85,36 @@ const TopBar = ({ title, right, refreshAction, className = '' }) => {
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Title */}
-        <motion.h1 
-          className="text-lg font-bold text-gray-900 dark:text-gray-100"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          {title}
-        </motion.h1>
+        {/* Left side - Back button and Title */}
+        <div className="flex items-center gap-3">
+          {/* Back button - only show when not on home page */}
+          {shouldShowBackButton && (
+            <motion.button
+              onClick={handleGoBack}
+              className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Indietro"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </motion.button>
+          )}
+          
+          {/* Title */}
+          <motion.h1 
+            className="text-lg font-bold text-gray-900 dark:text-gray-100"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            {title}
+          </motion.h1>
+        </div>
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
