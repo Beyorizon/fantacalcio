@@ -101,7 +101,70 @@ export default function Rosa() {
         .select('*')
         .eq('utente', utenteId);
 
-      if (giocatori) setRosa(giocatori);
+      const richiesti = ["29", "30", "31"];
+      const esistenti = (giocatori || []).filter(g => richiesti.includes(g.numero)).map(g => g.numero);
+      const daCreare = richiesti.filter(n => !esistenti.includes(n));
+      if (daCreare.length > 0) {
+        const { error } = await supabase
+          .from('giocatori')
+          .insert(daCreare.map(n => ({
+            utente: utenteId,
+            numero: n,
+            nome: "",
+            ruolo: "-",
+            u23: "No",
+            sc: "-",
+            cl: "0",
+            fm: "0",
+          })));
+        if (error) {
+          setToast({ show: true, message: 'Errore creazione extra', type: 'error' });
+          setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
+        }
+        const { data: giocatoriAgg } = await supabase
+          .from('giocatori')
+          .select('*')
+          .eq('utente', utenteId);
+        // Rimuove eventuali duplicati per 29/30/31 tenendo solo il primo
+        const extrasAgg = (giocatoriAgg || []).filter(g => richiesti.includes(g.numero));
+        const idsDuplicati = extrasAgg
+          .map((g, idx, arr) => (arr.findIndex(x => x.numero === g.numero) !== idx ? g.id : null))
+          .filter(Boolean);
+        if (idsDuplicati.length > 0) {
+          await supabase.from('giocatori').delete().in('id', idsDuplicati);
+          const { data: giocatoriPuliti } = await supabase
+            .from('giocatori')
+            .select('*')
+            .eq('utente', utenteId);
+          if (giocatoriPuliti) {
+            setRosa(giocatoriPuliti);
+          } else if (giocatoriAgg) {
+            setRosa(giocatoriAgg);
+          }
+        } else if (giocatoriAgg) {
+          setRosa(giocatoriAgg);
+        }
+      } else {
+        // Se non c'è nulla da creare, pulizia duplicati se presenti
+        const extras = (giocatori || []).filter(g => richiesti.includes(g.numero));
+        const idsDuplicati = extras
+          .map((g, idx, arr) => (arr.findIndex(x => x.numero === g.numero) !== idx ? g.id : null))
+          .filter(Boolean);
+        if (idsDuplicati.length > 0) {
+          await supabase.from('giocatori').delete().in('id', idsDuplicati);
+          const { data: giocatoriPuliti } = await supabase
+            .from('giocatori')
+            .select('*')
+            .eq('utente', utenteId);
+          if (giocatoriPuliti) {
+            setRosa(giocatoriPuliti);
+          } else if (giocatori) {
+            setRosa(giocatori);
+          }
+        } else if (giocatori) {
+          setRosa(giocatori);
+        }
+      }
 
       // Decodifica il nome utente per evitare %20
       const nomeDecodificato = decodeURIComponent(utenteId);
@@ -130,7 +193,7 @@ export default function Rosa() {
 
   // Ordinamento giocatori
   const rosaOrdinata = [...rosa].sort((a, b) => {
-    const ordine = ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1)), "X"];
+    const ordine = ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1)), "29", "30", "31", "X"];
     const indexA = ordine.indexOf(a.numero);
     const indexB = ordine.indexOf(b.numero);
     return indexA - indexB;
@@ -140,7 +203,50 @@ export default function Rosa() {
     ["P1", "P2", ...Array.from({ length: 28 }, (_, i) => String(i + 1)), "X"].includes(g.numero)
   );
 
-  const giocatoriExtra = rosaOrdinata.filter(g => ["29", "30"].includes(g.numero));
+  const extraNumeri = ["29", "30", "31"];
+  const giocatoriExtra = extraNumeri.map(n => (
+    rosaOrdinata.find(g => g.numero === n) || {
+      id: null,
+      numero: n,
+      nome: "",
+      ruolo: "-",
+      u23: "No",
+      sc: "-",
+      cl: "0",
+      fm: "0",
+      placeholder: true
+    }
+  ));
+
+  const ensureExtraEsistono = async () => {
+    const esistenti = rosa.filter(g => extraNumeri.includes(g.numero)).map(g => g.numero);
+    const daCreare = extraNumeri.filter(n => !esistenti.includes(n));
+    if (daCreare.length === 0) return;
+    const { error } = await supabase
+      .from('giocatori')
+      .insert(daCreare.map(n => ({
+        utente: utenteId,
+        numero: n,
+        nome: "",
+        ruolo: "-",
+        u23: "No",
+        sc: "-",
+        cl: "0",
+        fm: "0",
+      })));
+    if (!error) {
+      const { data: giocatoriAgg } = await supabase
+        .from('giocatori')
+        .select('*')
+        .eq('utente', utenteId);
+      if (giocatoriAgg) setRosa(giocatoriAgg);
+      setToast({ show: true, message: 'Extra creati', type: 'success' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 2000);
+    } else {
+      setToast({ show: true, message: 'Errore creazione extra', type: 'error' });
+      setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
+    }
+  };
 
   // Aggiornamento campi generico
   const handleUpdate = async (giocatoreId, campo, valore) => {
@@ -331,8 +437,18 @@ export default function Rosa() {
       {giocatoriExtra.length > 0 && (
         <div className="mt-8 pb-20 pl-5 pr-5">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-left">
-            🎯 Giocatori Extra (29-30)
+            🎯 Giocatori Extra (29-31)
           </h3>
+          {isAdmin && (
+            <div className="mb-3 text-left">
+              <button
+                onClick={ensureExtraEsistono}
+                className="px-3 py-1 text-xs rounded-lg bg-brand-500 text-white hover:bg-brand-600"
+              >
+                Aggiungi mancanti
+              </button>
+            </div>
+          )}
           <div className="w-full overflow-x-auto">
             <table className="min-w-[320px] table-fixed text-xs sm:text-sm">
               <thead className="sticky top-0 bg-white dark:bg-gray-950 z-10">
@@ -361,9 +477,21 @@ export default function Rosa() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {giocatoriExtra.map((giocatore) => (
+                {extraNumeri.map((n) => {
+                  const giocatore = rosaOrdinata.find(g => g.numero === n) || {
+                    id: null,
+                    numero: n,
+                    nome: "",
+                    ruolo: "-",
+                    u23: "No",
+                    sc: "-",
+                    cl: "0",
+                    fm: "0",
+                    placeholder: true
+                  };
+                  return (
                   <tr 
-                    key={giocatore.id} 
+                    key={n} 
                     className={`transition-colors duration-150 
                       hover:bg-brand-50/40 dark:hover:bg-gray-800/50 
                       ${giocatore.u23 === "Si" ? "bg-blue-100 dark:bg-blue-900" : ""}
@@ -420,7 +548,7 @@ export default function Rosa() {
                       />
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
